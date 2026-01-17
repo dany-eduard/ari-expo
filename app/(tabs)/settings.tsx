@@ -105,6 +105,7 @@ export default function SettingsScreen() {
 
               <TouchableOpacity
                 activeOpacity={0.7}
+                onPress={() => ShowAlert("Info", "Funcionalidad en desarrollo, pronto estará disponible.")}
                 className="w-full flex-row items-center justify-between p-5 border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800/50"
               >
                 <View className="flex-row items-center gap-4">
@@ -118,6 +119,7 @@ export default function SettingsScreen() {
 
               <TouchableOpacity
                 activeOpacity={0.7}
+                onPress={() => ShowAlert("Info", "Funcionalidad en desarrollo, pronto estará disponible.")}
                 className="w-full flex-row items-center justify-between p-5 active:bg-slate-50 dark:active:bg-slate-800/50"
               >
                 <View className="flex-row items-center gap-4">
