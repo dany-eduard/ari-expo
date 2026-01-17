@@ -8,6 +8,7 @@ module.exports = {
       colors: {
         primary: "#2563eb", // Blue 600
         "background-page": "#ffffff",
+        card: "#ffffff",
         "surface-input": "#f8fafc", // Slate 50
         "border-input": "#e2e8f0", // Slate 200
         "text-main": "#0f172a", // Slate 900
@@ -20,6 +21,8 @@ module.exports = {
         DEFAULT: "0.25rem",
         lg: "0.5rem",
         xl: "0.75rem",
+        "2xl": "1rem",
+        "3xl": "1.5rem",
         full: "9999px",
       },
     },
