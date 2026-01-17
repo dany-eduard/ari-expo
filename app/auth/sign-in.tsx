@@ -12,8 +12,8 @@ import { ActivityIndicator, KeyboardAvoidingView, ScrollView, Text, TouchableOpa
 const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [formData, setFormData] = useState<LoginFormData>({
     congregation: "",
-    email: "admin@test.com",
-    password: "Qwerty123*",
+    email: "",
+    password: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +24,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       const response = await congregationService.getCongregations();
       if (!response || response.length === 0) return;
       setCongregations(
-        response.map((congregation: any) => ({ label: `${congregation.name} ${congregation?.code || ""}`, value: congregation.id }))
+        response.map((congregation: any) => ({ label: `${congregation.name} ${congregation?.code || ""}`, value: congregation.id })),
       );
     } catch (error) {
       console.error("Error fetching congregations:", error);
