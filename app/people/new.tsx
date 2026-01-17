@@ -12,7 +12,6 @@ export default function NewPersonScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCreate = async (data: Partial<Person>) => {
-    console.log(data);
     if (!user?.congregation_id) return;
 
     if (!data.first_name || !data.last_name || !data.sex || !data.birth_date || !data.team_id) {

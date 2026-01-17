@@ -7,7 +7,6 @@ import { Platform } from "react-native";
 import { navigationState } from "./navigation.state";
 
 function redirect() {
-  console.log("redirect");
   router.push("/auth/sign-in");
 }
 
@@ -16,7 +15,6 @@ async function validateToken(token: string) {
 
   try {
     const payload = decodeJwt(token);
-    console.log("Datos del usuario:", payload);
     console.log("Expira en:", new Date(payload.exp! * 1000).toLocaleString());
 
     if (payload.exp && payload.exp < Date.now() / 1000) {

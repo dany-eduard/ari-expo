@@ -197,7 +197,6 @@ export default function NewReportScreen() {
     setIsLoadingReports(true);
     try {
       const reports = await publisherReportService.getPublisherReportsByPersonId({ person_id: id!, limit: 3, order: "desc" });
-      console.log("reports", reports);
       setReports(reports);
     } catch (error) {
       ShowAlert("Error", "No se pudo obtener la lista de reportes de la persona");

@@ -100,7 +100,6 @@ export default function ReportHistoryScreen() {
   const insets = useSafeAreaInsets();
   const [person, setPerson] = useState<Person | null>(null);
   const [reports, setReports] = useState<(PublisherReport & { isCurrent?: boolean; isFuture?: boolean })[]>([]);
-  console.log("reports", reports);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedYear, setSelectedYear] = useState(currentYear);
 
