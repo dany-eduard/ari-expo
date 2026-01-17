@@ -1,11 +1,20 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import { ComponentProps } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 
-export function NoData({ title, handleClearFilters }: { title: string; handleClearFilters?: () => void }) {
+export function NoData({
+  title,
+  handleClearFilters,
+  icon = "group-off",
+}: {
+  title: string;
+  handleClearFilters?: () => void;
+  icon?: ComponentProps<typeof MaterialIcons>["name"];
+}) {
   return (
     <View className="flex-1 items-center justify-center py-20">
       <View className="bg-slate-100 p-6 rounded-full mb-4">
-        <MaterialIcons name="group-off" size={60} color="#94a3b8" />
+        <MaterialIcons name={icon} size={60} color="#94a3b8" />
       </View>
       <Text className="text-lg font-medium text-slate-600">{title}</Text>
       {handleClearFilters && (

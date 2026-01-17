@@ -1,5 +1,6 @@
 import { ShowAlert } from "@/components/alert";
 import { Loading } from "@/components/ui/loading";
+import { NoData } from "@/components/ui/no-data";
 import { personService } from "@/services/person.service";
 import { publisherReportService } from "@/services/publisher-report.service";
 import { Person } from "@/types/person.types";
@@ -113,10 +114,10 @@ export default function ReportHistoryScreen() {
       ]);
       setPerson(personData);
 
-      // if (reportsData.length === 0) {
-      //   setReports([]);
-      //   return;
-      // }
+      if (reportsData.length === 0 && selectedYear < currentYear) {
+        setReports([]);
+        return;
+      }
 
       const reportsByMonth = reportsData.reduce(
         (acc, report) => {
@@ -375,7 +376,7 @@ export default function ReportHistoryScreen() {
 
           {reports.length === 0 && (
             <View className="p-8 items-center justify-center">
-              <Text className="text-gray-400">No hay reportes para este año</Text>
+              <NoData icon="description" title="No hay reportes para este año" />
             </View>
           )}
         </View>
