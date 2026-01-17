@@ -121,7 +121,7 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchReportCongregationHome();
-    }, [fetchReportCongregationHome])
+    }, [fetchReportCongregationHome]),
   );
 
   return (
@@ -214,7 +214,7 @@ export default function HomeScreen() {
 
         {/* Quick Actions */}
         <View className="px-4 pb-2">
-          <Text className="text-lg font-bold mb-4">Acciones Rápidas</Text>
+          <Text className="text-lg font-bold mb-4">Acciones rápidas</Text>
           <View className="flex-row gap-4">
             <TouchableOpacity
               activeOpacity={0.7}
@@ -234,7 +234,7 @@ export default function HomeScreen() {
               <View className="bg-indigo-50 dark:bg-indigo-500/10 p-3 rounded-full">
                 <MaterialIcon name="person-add" size={24} color="#4f46e5" />
               </View>
-              <Text className="text-sm font-medium text-slate-600 dark:text-slate-200">Nueva Persona</Text>
+              <Text className="text-sm font-medium text-slate-600 dark:text-slate-200">Nueva persona</Text>
             </TouchableOpacity>
           </View>
         </View>
