@@ -9,4 +9,5 @@ export interface SelectFieldProps {
   placeholder?: string;
   onChange: (value: string) => void;
   options: SelectOption[];
+  disabled?: boolean;
 }

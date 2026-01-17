@@ -5,5 +5,7 @@ export interface InputFieldProps {
   value: string;
   onChange: (value: string) => void;
   icon?: string;
+  iconPosition?: "left" | "right";
   showToggle?: boolean;
+  disabled?: boolean;
 }
