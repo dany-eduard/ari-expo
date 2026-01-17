@@ -5,5 +5,5 @@ export interface LoginFormData {
 }
 
 export interface LoginFormProps {
-  onLogin: (data: LoginFormData) => void;
+  onLogin: (data: LoginFormData) => Promise<void>;
 }

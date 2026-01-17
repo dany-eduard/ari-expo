@@ -1,19 +1,11 @@
-import { API_URL } from "@/constants/config";
+import { api } from "@/services/api";
 
 export const congregationService = {
   async getCongregations() {
-    const response = await fetch(`${API_URL}/congregations`);
-    return response.json();
+    return api.get("/congregations");
   },
 
   async createCongregation(data: any) {
-    const response = await fetch(`${API_URL}/congregations`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    return response.json();
+    return api.post("/congregations", data);
   },
 };

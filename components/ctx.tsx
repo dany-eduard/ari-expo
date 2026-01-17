@@ -1,17 +1,19 @@
 import { useStorageState } from "@/hooks/useStorageState";
 import { authService } from "@/services/auth.service";
 import { LoginFormData } from "@/types/auth.types";
-import { createContext, useContext, type PropsWithChildren } from "react";
+import { createContext, useCallback, useContext, useMemo, type PropsWithChildren } from "react";
 
 const AuthContext = createContext<{
   signIn: (data: LoginFormData) => Promise<void>;
   signOut: () => void;
   session?: string | null;
+  user?: any | null;
   isLoading: boolean;
 }>({
   signIn: async () => {},
   signOut: () => null,
   session: null,
+  user: null,
   isLoading: false,
 });
 
@@ -29,27 +31,37 @@ export function useSession() {
 
 export function SessionProvider({ children }: PropsWithChildren) {
   const [[isLoading, session], setSession] = useStorageState("session");
+  const [[, user], setUser] = useStorageState("user");
 
-  return (
-    <AuthContext.Provider
-      value={{
-        signIn: async (data: LoginFormData) => {
-          try {
-            const { access_token } = await authService.login(data);
-            setSession(access_token);
-          } catch (error) {
-            console.error("Login failed:", error);
-            throw error;
-          }
-        },
-        signOut: () => {
-          setSession(null);
-        },
-        session,
-        isLoading,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const signIn = useCallback(
+    async (data: LoginFormData) => {
+      try {
+        const { access_token, user } = await authService.login(data);
+        setSession(access_token);
+        setUser(JSON.stringify(user));
+      } catch (error) {
+        console.error("Login failed:", error);
+        throw error;
+      }
+    },
+    [setSession, setUser]
   );
+
+  const signOut = useCallback(() => {
+    setSession(null);
+    setUser(null);
+  }, [setSession, setUser]);
+
+  const contextValue = useMemo(
+    () => ({
+      signIn,
+      signOut,
+      session,
+      user: JSON.parse(user || "{}"),
+      isLoading,
+    }),
+    [signIn, signOut, session, user, isLoading]
+  );
+
+  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;
 }

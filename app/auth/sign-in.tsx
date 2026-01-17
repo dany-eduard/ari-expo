@@ -3,15 +3,15 @@ import { useSession } from "@/components/ctx";
 import InputField from "@/components/ui/inputField";
 import SelectField from "@/components/ui/selectField";
 import { congregationService } from "@/services/congregation.service";
+import { LoginFormData, LoginFormProps } from "@/types/auth.types";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { LoginFormData, LoginFormProps } from "../../types/auth.types";
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [formData, setFormData] = useState<LoginFormData>({
-    congregation: "1",
+    congregation: "",
     email: "admin@test.com",
     password: "Qwerty123*",
   });
@@ -19,9 +19,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [congregations, setCongregations] = useState<{ label: string; value: string }[]>([]);
 
-  const fetchCongregations = async () => {
+  const fetchCongregations = useCallback(async () => {
     try {
       const response = await congregationService.getCongregations();
+      if (!response || response.length === 0) return;
       setCongregations(
         response.map((congregation: any) => ({ label: `${congregation.name} ${congregation?.code || ""}`, value: congregation.id }))
       );
@@ -29,7 +30,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       console.error("Error fetching congregations:", error);
       ShowAlert("Error", "Ocurrió un error al cargar las congregaciones");
     }
-  };
+  }, []);
 
   const handleSubmit = async () => {
     if (!formData.email || !formData.password || !formData.congregation) {
@@ -40,8 +41,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     setIsLoading(true);
     try {
       await onLogin(formData);
-    } catch (error: any) {
-      ShowAlert("Error de inicio de sesión", error.message || "Ocurrió un error inesperado");
+    } catch (error) {
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -115,9 +116,13 @@ const SignInScreen: React.FC = () => {
   const { signIn } = useSession();
 
   const handleLogin = async (data: LoginFormData) => {
-    await signIn(data);
-    // Navigate after signing in.
-    router.replace("/");
+    try {
+      await signIn(data);
+      router.replace("/");
+    } catch (error: any) {
+      const messageError = typeof error === "string" ? error : error?.message || "Ocurrió un error inesperado";
+      ShowAlert("Error de inicio de sesión", messageError);
+    }
   };
 
   return (
