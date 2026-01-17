@@ -46,7 +46,6 @@ function RootLayoutNav() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="auth/sign-in" options={{ headerShown: false, animation: "fade", animationDuration: 200 }} />
-        <Stack.Screen name="auth/sign-out" options={{ headerShown: false }} />
         <Stack.Screen name="auth/sign-up" options={{ headerShown: false, animation: "fade", animationDuration: 200 }} />
         <Stack.Screen name="teams" options={{ headerShown: false }} />
         <Stack.Screen name="people" options={{ headerShown: false }} />
