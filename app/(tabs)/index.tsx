@@ -5,8 +5,8 @@ import { reportService } from "@/services/report.service";
 import { ReportCongregationHome } from "@/types/report.types";
 import { day, getInitialPeriod } from "@/utils/date.utils";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { router } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -118,9 +118,11 @@ export default function HomeScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchReportCongregationHome();
-  }, [fetchReportCongregationHome]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchReportCongregationHome();
+    }, [fetchReportCongregationHome])
+  );
 
   return (
     <ThemedView style={{ flex: 1 }}>

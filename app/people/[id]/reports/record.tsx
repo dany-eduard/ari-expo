@@ -6,8 +6,8 @@ import { publisherReportService } from "@/services/publisher-report.service";
 import { Person } from "@/types/person.types";
 import { PublisherReport } from "@/types/publisher-report.types";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Link, router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import { Link, router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -158,9 +158,11 @@ export default function ReportHistoryScreen() {
     }
   }, [id, selectedYear]);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [fetchData])
+  );
 
   const totalHours = reports.reduce((sum, r) => sum + (r.hours || 0), 0);
   const averageHours = reports.length > 0 ? (totalHours / reports.length).toFixed(1) : "0.0";
