@@ -9,6 +9,11 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "export:web": "expo export --platform web",
+    "build:android:preview": "eas build -p android --profile preview",
+    "build:android:production": "eas build -p android --profile production",
+    "update:preview": "eas update --branch preview",
+    "update:production": "eas update --branch production",
     "version:patch": "node ./scripts/bump-version.js patch",
     "version:minor": "node ./scripts/bump-version.js minor",
     "version:major": "node ./scripts/bump-version.js major"
