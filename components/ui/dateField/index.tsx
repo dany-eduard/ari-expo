@@ -1,3 +1,4 @@
+import { dateToISOString, formatUTCToLocaleString, getUTCDateObject } from "@/utils/date.utils";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Modal, Pressable, ScrollView, Text, TouchableOpacity, View } from "react-native";
@@ -53,10 +54,25 @@ const DateField: React.FC<DateFieldProps> = ({ label, value, onChange, placehold
   };
 
   // Parse current value or use today's date
-  const date = value ? new Date(value) : new Date();
-  const [tempDay, setTempDay] = useState(date.getDate());
-  const [tempMonth, setTempMonth] = useState(date.getMonth()); // 0-indexed
-  const [tempYear, setTempYear] = useState(date.getFullYear());
+  const {
+    day: initialDay,
+    month: initialMonth, // 0-indexed
+    year: initialYear,
+  } = value ? getUTCDateObject(value) : { day: new Date().getDate(), month: new Date().getMonth(), year: new Date().getFullYear() };
+
+  const [tempDay, setTempDay] = useState(initialDay);
+  const [tempMonth, setTempMonth] = useState(initialMonth);
+  const [tempYear, setTempYear] = useState(initialYear);
+
+  // Sync state when value changes
+  useEffect(() => {
+    if (value) {
+      const { day, month, year } = getUTCDateObject(value);
+      setTempDay(day);
+      setTempMonth(month);
+      setTempYear(year);
+    }
+  }, [value]);
 
   const years = useMemo(() => {
     const currentYear = new Date().getFullYear();
@@ -85,13 +101,12 @@ const DateField: React.FC<DateFieldProps> = ({ label, value, onChange, placehold
     const maxDays = getDaysInMonth(tempMonth, tempYear);
     const finalDay = Math.min(tempDay, maxDays);
 
-    const formattedMonth = (tempMonth + 1).toString().padStart(2, "0");
-    const formattedDay = finalDay.toString().padStart(2, "0");
-    onChange(`${tempYear}-${formattedMonth}-${formattedDay}`);
+    const formattedDate = dateToISOString(tempYear, tempMonth, finalDay);
+    onChange(formattedDate);
     setModalVisible(false);
   };
 
-  const displayDate = value ? `${tempDay} de ${months[tempMonth]}, ${tempYear}` : placeholder || "Seleccionar fecha";
+  const displayDate = value ? formatUTCToLocaleString(value) : placeholder || "Seleccionar fecha";
 
   return (
     <View className="flex flex-col gap-2">
