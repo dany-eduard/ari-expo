@@ -195,7 +195,7 @@ export default function HomeScreen() {
                 <View className="gap-2">
                   <View className="flex-row justify-between items-center">
                     <Text className="text-[10px] text-sky-100 font-bold uppercase">Progreso</Text>
-                    <Text className="text-xs text-white font-bold">{getPercentage()}%</Text>
+                    <Text className="text-xs text-white font-bold">{getPercentage().toFixed(0)}%</Text>
                   </View>
                   <View className="h-2.5 w-full bg-black/20 rounded-full overflow-hidden border border-white/10">
                     <View className="h-full bg-white rounded-full" style={{ width: `${getPercentage()}%` }} />
