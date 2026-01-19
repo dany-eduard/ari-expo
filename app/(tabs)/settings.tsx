@@ -4,6 +4,7 @@ import { APP_VERSION } from "@/constants/config";
 import { reportService } from "@/services/report.service";
 import { currentYear, getInitialPeriod } from "@/utils/date.utils";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { router } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -76,8 +77,8 @@ export default function SettingsScreen() {
         </View>
       </View>
 
-      <ScrollView className="flex-1" contentContainerStyle={{ padding: 24, paddingBottom: 40 }}>
-        <View className="max-w-md mx-auto w-full space-y-8">
+      <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1, padding: 24, paddingBottom: 40 }}>
+        <View className="max-w-md mx-auto w-full flex-1 gap-8">
           {/* Section: Reportes y Análisis */}
           <View className="space-y-4">
             <Text className="px-1 text-xs font-bold text-slate-400 uppercase tracking-[0.1em]">Reportes y Análisis</Text>
@@ -132,28 +133,63 @@ export default function SettingsScreen() {
               </TouchableOpacity>
             </View>
           </View>
-
-          <View className="h-80" />
-
-          {/* Section: Logout */}
-          <View className="pt-4">
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={signOut}
+          {/* Section: Configuración */}
+          <View className="space-y-4">
+            <Text className="px-1 text-xs font-bold text-slate-400 uppercase tracking-[0.1em]">Configuración de app</Text>
+            <View
               style={styles.iosShadow}
-              className="w-full flex-row items-center justify-center gap-2 p-4 bg-white dark:bg-slate-900 rounded-2xl border border-red-50 dark:border-red-950/20 active:scale-[0.98]"
+              className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden"
             >
-              <MaterialIcon name="logout" size={20} color="#ef4444" />
-              <Text className="text-red-500 font-bold">Cerrar sesión</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => ShowAlert("Info", "Funcionalidad en desarrollo, pronto estará disponible.")}
+                className="w-full flex-row items-center justify-between p-5 border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800/50"
+              >
+                <View className="flex-row items-center gap-4">
+                  <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
+                    <MaterialIcon name="group-work" size={22} color="#2563eb" />
+                  </View>
+                  <Text className="font-semibold text-[16px] text-slate-700 dark:text-slate-200">Administrar congregaciones</Text>
+                </View>
+                <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
+              </TouchableOpacity>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => router.push("/auth/sign-up")}
+                className="w-full flex-row items-center justify-between p-5 border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800/50"
+              >
+                <View className="flex-row items-center gap-4">
+                  <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
+                    <MaterialIcon name="person-add" size={22} color="#2563eb" />
+                  </View>
+                  <Text className="font-semibold text-[16px] text-slate-700 dark:text-slate-200">Registrar usuario</Text>
+                </View>
+                <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
+              </TouchableOpacity>
+            </View>
           </View>
 
-          {/* Version Info */}
-          <View className="items-center py-1">
-            <Text className="text-slate-400 dark:text-slate-500 text-xs font-medium">ARI v{APP_VERSION}</Text>
-            <Text className="text-slate-300 dark:text-slate-600 text-[10px] mt-1 uppercase tracking-widest">
-              © {currentYear} ARI Mobile App
-            </Text>
+          <View className="mt-auto gap-8">
+            {/* Section: Logout */}
+            <View className="pt-4">
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={signOut}
+                style={styles.iosShadow}
+                className="w-full flex-row items-center justify-center gap-2 p-4 bg-white dark:bg-slate-900 rounded-2xl border border-red-50 dark:border-red-950/20 active:scale-[0.98]"
+              >
+                <MaterialIcon name="logout" size={20} color="#ef4444" />
+                <Text className="text-red-500 font-bold">Cerrar sesión</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Version Info */}
+            <View className="items-center py-1">
+              <Text className="text-slate-400 dark:text-slate-500 text-xs font-medium">ARI v{APP_VERSION}</Text>
+              <Text className="text-slate-300 dark:text-slate-600 text-[10px] mt-1 uppercase tracking-widest">
+                © {currentYear} ARI Mobile App
+              </Text>
+            </View>
           </View>
         </View>
       </ScrollView>
