@@ -22,6 +22,7 @@ export default function TeamDetailsScreen() {
   const [menuVisible, setMenuVisible] = useState(false);
 
   const fetchTeam = useCallback(async () => {
+    setIsLoading(true);
     try {
       const data = await teamService.getTeamById(id);
       data.total_people = data.people.length;
@@ -39,7 +40,7 @@ export default function TeamDetailsScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchTeam();
-    }, [fetchTeam])
+    }, [fetchTeam]),
   );
 
   const handleDeleteGroup = () => {
