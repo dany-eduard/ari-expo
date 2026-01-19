@@ -1,9 +1,11 @@
-import { Alert, AlertButton, Platform } from "react-native";
+import { AlertButton, Alert as NativeAlert } from "react-native";
+import { alertRef } from "./providers/AlertProvider";
 
 export function ShowAlert(title: string, message?: string, buttons?: AlertButton[]) {
-  if (Platform.OS === "web") {
-    window.alert(`${title}\n${message}`);
+  if (alertRef.current) {
+    alertRef.current(title, message, buttons);
   } else {
-    Alert.alert(title, message, buttons);
+    // Fallback to native alert if provider not mounted
+    NativeAlert.alert(title, message, buttons);
   }
 }

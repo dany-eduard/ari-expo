@@ -7,6 +7,7 @@ import "react-native-reanimated";
 import "../global.css";
 
 import { SessionProvider, useSession } from "@/components/ctx";
+import { AlertProvider } from "@/components/providers/AlertProvider";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useUpdateAlert } from "@/hooks/useUpdateAlert";
 
@@ -58,7 +59,9 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <SessionProvider>
-      <RootLayoutNav />
+      <AlertProvider>
+        <RootLayoutNav />
+      </AlertProvider>
     </SessionProvider>
   );
 }
