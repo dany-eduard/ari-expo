@@ -7,7 +7,7 @@ import { day, getInitialPeriod } from "@/utils/date.utils";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const styles = StyleSheet.create({
@@ -39,6 +39,10 @@ export default function HomeScreen() {
   const [homeData, setHomeData] = useState<ReportCongregationHome | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const { width } = useWindowDimensions();
+
+  const isSmallScreen = width < 360;
+  const isMediumScreen = width >= 640 && width < 1024;
 
   const fetchReportCongregationHome = useCallback(async () => {
     try {
@@ -240,10 +244,10 @@ export default function HomeScreen() {
         </View>
 
         {/* Stats Section */}
-        <View className="flex-row gap-2 px-4 py-3">
+        <View className={`flex-row flex-wrap gap-2 px-4 py-3 ${isSmallScreen ? "flex-col" : "flex-row"}`}>
           <View
             style={styles.floatingCard}
-            className="flex-1 rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800"
+            className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800`}
           >
             <View className="flex-row items-center justify-between">
               <View className="p-2 bg-purple-100 dark:bg-purple-500/10 rounded-lg">
@@ -257,7 +261,7 @@ export default function HomeScreen() {
           </View>
           <View
             style={styles.floatingCard}
-            className="flex-1 rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800"
+            className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800`}
           >
             <View className="flex-row items-center justify-between">
               <View className="p-2 bg-orange-100 dark:bg-orange-500/10 rounded-lg">
@@ -271,7 +275,7 @@ export default function HomeScreen() {
           </View>
           <View
             style={styles.floatingCard}
-            className="flex-1 rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800"
+            className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800`}
           >
             <View className="flex-row items-center justify-between">
               <View className="p-2 bg-green-100 dark:bg-green-500/10 rounded-lg">
@@ -288,11 +292,11 @@ export default function HomeScreen() {
         {/* Predication Summary Section */}
         <View className="px-4 pt-2">
           <Text className="text-lg font-bold mb-3 dark:text-white">Resumen de predicación</Text>
-          <View className="flex-row gap-2 pb-3">
+          <View className={`flex-row flex-wrap gap-2 pb-3 ${isSmallScreen ? "flex-col" : "flex-row"}`}>
             {/* Publicadores */}
             <View
               style={styles.floatingCard}
-              className="flex-1 rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800"
+              className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800`}
             >
               <View className="flex-row items-center gap-1.5 mb-2">
                 <MaterialIcon name="description" size={16} color="#3b82f6" />
@@ -315,7 +319,7 @@ export default function HomeScreen() {
             {/* Auxiliares */}
             <View
               style={styles.floatingCard}
-              className="flex-1 rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800"
+              className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800`}
             >
               <View className="flex-row items-center gap-1.5 mb-2">
                 <MaterialIcon name="access-time" size={16} color="#f59e0b" />
@@ -342,7 +346,7 @@ export default function HomeScreen() {
             {/* Regulares */}
             <View
               style={styles.floatingCard}
-              className="flex-1 rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800"
+              className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800`}
             >
               <View className="flex-row items-center gap-1.5 mb-2">
                 <MaterialIcon name="verified" size={16} color="#14b8a6" />
