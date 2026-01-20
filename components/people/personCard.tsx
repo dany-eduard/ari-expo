@@ -139,9 +139,9 @@ const PersonCard: React.FC<PersonCardProps> = ({ person, onPress }) => {
             </Text>
           </View>
 
-          {/* {person.status === "online" && (
-          <View className="absolute bottom-0 right-0 h-4 w-4 rounded-full bg-primary border-[3px] border-white" />
-        )} */}
+          {!person.already_sent_last_report && (
+            <View className="absolute bottom-0 right-0 h-4 w-4 rounded-full bg-red-400 border-[3px] border-white" />
+          )}
         </View>
 
         <View className="flex-1 flex-col justify-center">

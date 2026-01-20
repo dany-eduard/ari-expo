@@ -18,6 +18,8 @@ export interface Person {
   is_field_missionary?: boolean;
   is_other_sheep?: boolean;
   is_anointed?: boolean;
+
+  already_sent_last_report?: boolean;
 }
 
 export type Categories = typeof PERSON_CATEGORIES;
