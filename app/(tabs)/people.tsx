@@ -20,7 +20,7 @@ export default function PeopleScreen() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeCategory, setActiveCategory] = useState<keyof Categories | "is_inactive">();
+  const [activeCategory, setActiveCategory] = useState<keyof Categories | "is_inactive" | "is_male" | "not_sent_last_report">();
   const [people, setPeople] = useState<Person[]>([]);
 
   const fetchPeople = useCallback(async () => {
@@ -43,8 +43,19 @@ export default function PeopleScreen() {
       const fullName = `${person.first_name || ""} ${person.last_name || ""}`;
       const matchesSearch = fullName.toLowerCase().includes(searchTerm.toLowerCase());
       if (!activeCategory) return matchesSearch;
-      const matchesCategory =
-        activeCategory === "is_inactive" ? person.is_active === false : (person[activeCategory as keyof Person] as unknown) === true;
+      let matchesCategory = false;
+
+      if (activeCategory === "is_inactive") {
+        matchesCategory = person.is_active === false;
+      } else if (activeCategory === "is_male") {
+        matchesCategory = person.sex === "MALE";
+      } else if (activeCategory === "is_female") {
+        matchesCategory = person.sex === "FEMALE";
+      } else if (activeCategory === "not_sent_last_report") {
+        matchesCategory = person.already_sent_last_report === false && person.is_active === true;
+      } else {
+        matchesCategory = (person[activeCategory as keyof Person] as unknown) === true;
+      }
       return matchesSearch && matchesCategory;
     });
   }, [searchTerm, activeCategory, people]);
@@ -66,7 +77,7 @@ export default function PeopleScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchPeople();
-    }, [fetchPeople])
+    }, [fetchPeople]),
   );
 
   return (
@@ -76,7 +87,12 @@ export default function PeopleScreen() {
         <View className="gap-3 max-w-7xl mx-auto w-full px-4 md:px-6">
           <View className="flex-row items-center md:pt-6 pb-2 justify-between">
             <View>
-              <Text className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">Personas</Text>
+              <View className="flex-row items-center gap-2">
+                <Text className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">Personas</Text>
+                <View className="bg-primary/10 px-3 py-1 rounded-full">
+                  <Text className="text-sm font-semibold text-primary">{filteredPeople.length}</Text>
+                </View>
+              </View>
               <Text className="text-sm text-slate-500 font-medium">Congregación {user?.congregation || ""}</Text>
             </View>
 
@@ -127,9 +143,9 @@ export default function PeopleScreen() {
 
             <View className="w-full md:w-auto overflow-hidden">
               <FilterBar
-                categories={{ ...PERSON_CATEGORIES, is_inactive: "Inactivos" }}
+                categories={{ ...PERSON_CATEGORIES, is_inactive: "Inactivos", not_sent_last_report: "Sin último reporte enviado" }}
                 activeCategory={activeCategory!}
-                onSelectCategory={(cat) => setActiveCategory(cat as keyof Categories | "is_inactive")}
+                onSelectCategory={(cat) => setActiveCategory(cat as keyof Categories | "is_inactive" | "is_male" | "not_sent_last_report")}
               />
             </View>
           </View>
