@@ -1,6 +1,8 @@
 import { ShowAlert } from "@/components/alert";
 import { useSession } from "@/components/ctx";
+import SyncResultModal from "@/components/SyncResultModal";
 import { APP_VERSION } from "@/constants/config";
+import { personService } from "@/services/person.service";
 import { reportService } from "@/services/report.service";
 import { currentYear, getInitialPeriod } from "@/utils/date.utils";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
@@ -38,6 +40,12 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
 
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [showSyncModal, setShowSyncModal] = useState(false);
+  const [syncResult, setSyncResult] = useState<{
+    to_activate: { id: number; name: string }[];
+    to_deactivate: { id: number; name: string }[];
+  }>({ to_activate: [], to_deactivate: [] });
 
   const handleDownloadReport = async () => {
     if (!user?.congregation_id) return;
@@ -55,6 +63,26 @@ export default function SettingsScreen() {
       ShowAlert("Error", "No se pudo descargar el archivo.");
     } finally {
       setIsDownloading(false);
+    }
+  };
+
+  const handleSyncPeopleStatus = async () => {
+    console.log(user);
+    if (!user?.congregation_id) return;
+    setIsSyncing(true);
+
+    try {
+      const response = await personService.syncPeopleStatus(user.congregation_id);
+      setSyncResult({
+        to_activate: response?.to_activate || [],
+        to_deactivate: response?.to_deactivate || [],
+      });
+      setShowSyncModal(true);
+    } catch (error) {
+      console.error("Error syncing people status:", error);
+      ShowAlert("Error", "No se pudo sincronizar el estado de las personas.");
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -131,6 +159,22 @@ export default function SettingsScreen() {
                 </View>
                 <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
               </TouchableOpacity>
+
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={handleSyncPeopleStatus}
+                disabled={isSyncing}
+                className="w-full flex-row items-center justify-between p-5 active:bg-slate-50 dark:active:bg-slate-800/50"
+              >
+                <View className="flex-row items-center gap-4">
+                  <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
+                    <MaterialIcon name="sync" size={22} color="#2563eb" />
+                  </View>
+                  <Text className="font-semibold text-[16px] text-slate-700 dark:text-slate-200">Sincronizar estado de publicadores</Text>
+                  {isSyncing && <ActivityIndicator size="small" />}
+                </View>
+                <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
+              </TouchableOpacity>
             </View>
           </View>
           {/* Section: Configuración */}
@@ -193,6 +237,14 @@ export default function SettingsScreen() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Sync Result Modal */}
+      <SyncResultModal
+        visible={showSyncModal}
+        onClose={() => setShowSyncModal(false)}
+        toActivate={syncResult.to_activate}
+        toDeactivate={syncResult.to_deactivate}
+      />
     </View>
   );
 }

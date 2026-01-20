@@ -21,4 +21,8 @@ export const personService = {
   async deletePerson(id: number | string) {
     return api.delete(`/people/${id}`);
   },
+
+  async syncPeopleStatus(congregationId: number | string) {
+    return api.put(`congregations/${congregationId}/people/update-status`);
+  },
 };
