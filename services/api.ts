@@ -1,14 +1,13 @@
-import { ShowAlert } from "@/components/alert";
 import { API_URL } from "@/constants/config";
-import { router } from "expo-router";
+import { setStorageItemAsync } from "@/hooks/useStorageState";
 import * as SecureStore from "expo-secure-store";
 import { decodeJwt } from "jose";
 import { Platform } from "react-native";
 import { navigationState } from "./navigation.state";
 
-function redirect() {
-  router.push("/auth/sign-in");
-}
+// function redirect() {
+//   router.push("/auth/sign-in");
+// }
 
 async function validateToken(token: string) {
   if (!token) return false;
@@ -18,14 +17,14 @@ async function validateToken(token: string) {
     console.log("Expira en:", new Date(payload.exp! * 1000).toLocaleString());
 
     if (payload.exp && payload.exp < Date.now() / 1000) {
-      ShowAlert("Sesión expirada", "Por favor, inicia sesión de nuevo.");
-      removeToken();
+      console.warn("Sesión expirada");
+      await removeToken();
       return false;
     }
     return true;
   } catch (error) {
     console.error("Error al validar el token:", error);
-    removeToken();
+    await removeToken();
     return false;
   }
 }
@@ -50,21 +49,8 @@ async function getToken() {
 }
 
 async function removeToken() {
-  if (Platform.OS === "web") {
-    try {
-      if (typeof localStorage !== "undefined") {
-        localStorage.removeItem("session");
-      }
-    } catch (e) {
-      console.error("Local storage is unavailable:", e);
-    }
-  } else {
-    try {
-      return await SecureStore.deleteItemAsync("session");
-    } catch (e) {
-      console.error("SecureStore is unavailable:", e);
-    }
-  }
+  await setStorageItemAsync("session", null);
+  await setStorageItemAsync("user", null);
 }
 
 export { API_URL, getToken };
@@ -77,6 +63,7 @@ export const api = {
     const currentPath = Platform.OS === "web" ? window.location.pathname : navigationState.getPath();
     const toExclude =
       ["/auth/login", "/auth/sign-in"].includes(normalizedEndpoint) ||
+      (normalizedEndpoint === "/congregations" && options.method === "GET") ||
       ["/auth/sign-in", "/auth/sign-up"].some((path) => currentPath.includes(path));
 
     const token = await getToken();
@@ -93,10 +80,10 @@ export const api = {
         if (isValid) {
           headers["Authorization"] = `Bearer ${token}`;
         } else {
-          return redirect();
+          throw new Error("Unauthorized");
         }
       } else {
-        return redirect();
+        throw new Error("Unauthorized");
       }
     }
 

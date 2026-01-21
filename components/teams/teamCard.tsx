@@ -45,10 +45,7 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, onPress }) => {
       // className="flex-row items-center gap-4 p-4 bg-white rounded-2xl border border-slate-100 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] active:scale-[0.98] active:bg-slate-50"
       className="flex flex-row items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200"
       style={{
-        shadowColor: "#0f172a",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
+        boxShadow: "0px 2px 10px rgba(15, 23, 42, 0.05)",
         elevation: 2,
       }}
     >

@@ -54,10 +54,7 @@ const MenuOptions = ({
             backgroundColor: "white",
             borderRadius: 12,
             padding: 4,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.1,
-            shadowRadius: 12,
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
             elevation: 5,
             borderWidth: 1,
             borderColor: "#f1f5f9",
@@ -123,10 +120,7 @@ const PersonCard: React.FC<PersonCardProps> = ({ person, onPress }) => {
         onPress={onPress}
         className="flex flex-row items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200"
         style={{
-          shadowColor: "#0f172a",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.05,
-          shadowRadius: 10,
+          boxShadow: "0px 2px 10px rgba(15, 23, 42, 0.05)",
           elevation: 2,
         }}
       >
