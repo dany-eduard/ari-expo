@@ -19,8 +19,11 @@ export default function EditPersonScreen() {
       const data = await personService.getPersonById(id);
       setPerson(data);
     } catch (error) {
-      console.error("Error fetching person:", error);
-      ShowAlert("Error", "No se pudo cargar la información de la persona");
+      if (error instanceof Error && error.message === "Unauthorized") {
+        ShowAlert("Error", error.message);
+      } else {
+        ShowAlert("Error", "No se pudo obtener la información de la persona");
+      }
       router.back();
     } finally {
       setIsLoading(false);
@@ -48,8 +51,11 @@ export default function EditPersonScreen() {
       ShowAlert("Éxito", "Persona actualizada correctamente");
       router.back();
     } catch (error) {
-      console.error("Error updating person:", error);
-      ShowAlert("Error", "No se pudo actualizar la persona");
+      if (error instanceof Error && error.message === "Unauthorized") {
+        ShowAlert("Error", error.message);
+      } else {
+        ShowAlert("Error", "No se pudo actualizar la persona");
+      }
     } finally {
       setIsSaving(false);
     }

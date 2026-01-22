@@ -124,7 +124,7 @@ export default function ReportHistoryScreen() {
           acc[report.month] = report;
           return acc;
         },
-        {} as Record<number, PublisherReport>
+        {} as Record<number, PublisherReport>,
       );
 
       const { month: initialMonth, year: initialYear } = getInitialPeriod();
@@ -151,8 +151,11 @@ export default function ReportHistoryScreen() {
 
       setReports(orderedReports);
     } catch (error) {
-      console.error("Error fetching record data:", error);
-      ShowAlert("Error", "No se pudo cargar el historial");
+      if (error instanceof Error && error.message === "Unauthorized") {
+        ShowAlert("Error", error.message);
+      } else {
+        ShowAlert("Error", "No se pudo obtener el historial");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -161,7 +164,7 @@ export default function ReportHistoryScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchData();
-    }, [fetchData])
+    }, [fetchData]),
   );
 
   const totalHours = reports.reduce((sum, r) => sum + (r.hours || 0), 0);

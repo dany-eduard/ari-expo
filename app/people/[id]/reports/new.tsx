@@ -185,8 +185,11 @@ export default function NewReportScreen() {
       setPublishers(publishers);
       setPeople(people);
     } catch (error) {
-      ShowAlert("Error", "No se pudo obtener la lista de personas de la congregación");
-      console.error("Error fetching people:", error);
+      if (error instanceof Error && error.message === "Unauthorized") {
+        ShowAlert("Error", error.message);
+      } else {
+        ShowAlert("Error", "No se pudo obtener la lista de personas de la congregación");
+      }
     } finally {
       setIsLoading(false);
     }

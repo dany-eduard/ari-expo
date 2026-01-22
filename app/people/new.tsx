@@ -30,8 +30,11 @@ export default function NewPersonScreen() {
       ShowAlert("Éxito", "Persona creada correctamente");
       router.back();
     } catch (error) {
-      console.error("Error creating person:", error);
-      ShowAlert("Error", "No se pudo crear la persona");
+      if (error instanceof Error && error.message === "Unauthorized") {
+        ShowAlert("Error", error.message);
+      } else {
+        ShowAlert("Error", "No se pudo crear la persona");
+      }
     } finally {
       setIsSubmitting(false);
     }
