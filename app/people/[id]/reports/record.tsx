@@ -8,40 +8,40 @@ import { PublisherReport } from "@/types/publisher-report.types";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link, router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, useColorScheme, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const getBadgeStyles = (dept: string) => {
   switch (dept) {
     case "is_regular_pioneer":
-      return "bg-green-100 border-green-200";
+      return "bg-green-100 dark:bg-green-900/30 border-green-200 dark:border-green-800";
     case "is_elder":
-      return "bg-blue-100 border-blue-200";
+      return "bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800";
     case "is_ministerial_servant":
-      return "bg-blue-100 border-blue-200";
+      return "bg-blue-100 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800";
     case "is_special_pioneer":
-      return "bg-rose-100 border-rose-200";
+      return "bg-rose-100 dark:bg-rose-900/30 border-rose-200 dark:border-rose-800";
     case "is_field_missionary":
-      return "bg-rose-100 border-rose-200";
+      return "bg-rose-100 dark:bg-rose-900/30 border-rose-200 dark:border-rose-800";
     default:
-      return "bg-slate-100 border-slate-200";
+      return "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700";
   }
 };
 
 const getBadgeTextStyles = (dept: string) => {
   switch (dept) {
     case "is_regular_pioneer":
-      return "text-green-700";
+      return "text-green-700 dark:text-green-400";
     case "is_elder":
-      return "text-blue-700";
+      return "text-blue-700 dark:text-blue-400";
     case "is_ministerial_servant":
-      return "text-blue-700";
+      return "text-blue-700 dark:text-blue-400";
     case "is_special_pioneer":
-      return "text-rose-700";
+      return "text-rose-700 dark:text-rose-400";
     case "is_field_missionary":
-      return "text-rose-700";
+      return "text-rose-700 dark:text-rose-400";
     default:
-      return "text-slate-700";
+      return "text-slate-700 dark:text-slate-400";
   }
 };
 
@@ -99,6 +99,7 @@ const getInitialPeriod = () => {
 export default function ReportHistoryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
   const [person, setPerson] = useState<Person | null>(null);
   const [reports, setReports] = useState<(PublisherReport & { isCurrent?: boolean; isFuture?: boolean })[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -174,15 +175,18 @@ export default function ReportHistoryScreen() {
   if (!person) return null;
 
   return (
-    <View className="flex-1 bg-slate-50" style={{ paddingTop: insets.top }}>
+    <View className="flex-1 bg-background-light dark:bg-background-dark" style={{ paddingTop: insets.top }}>
       {/* Header with Back Button (Replacing custom nav from HTML) */}
-      <View className="bg-white/95 border-b border-gray-200 z-50">
+      <View className="bg-background-light/95 dark:bg-card-dark/95 border-b border-border-input-light dark:border-border-input-dark z-50">
         <View className="flex-row items-center justify-between px-4 h-[60px]">
           <TouchableOpacity onPress={() => router.back()} className="flex-row items-center gap-1 active:opacity-60">
             <MaterialIcons name="chevron-left" size={28} color="#2563eb" />
             <Text className="text-primary text-[17px] font-normal">Atrás</Text>
           </TouchableOpacity>
-          <Text className="text-[17px] font-semibold text-center text-slate-900 absolute left-1/2 -translate-x-1/2" numberOfLines={1}>
+          <Text
+            className="text-[17px] font-semibold text-center text-text-main-light dark:text-text-main-dark absolute left-1/2 -translate-x-1/2"
+            numberOfLines={1}
+          >
             Registro
           </Text>
           <TouchableOpacity onPress={() => router.push(`/people/${id}?edit=true`)} className="active:opacity-60">
@@ -204,7 +208,7 @@ export default function ReportHistoryScreen() {
             </Text>
           </View>
           <View className="flex-1">
-            <Text className="text-2xl font-bold text-slate-900 leading-tight" numberOfLines={2}>
+            <Text className="text-2xl font-bold text-text-main-light dark:text-text-main-dark leading-tight" numberOfLines={2}>
               {person.first_name} {person.last_name}
             </Text>
             <View className="flex-row flex-wrap gap-2 mt-1">
@@ -225,8 +229,8 @@ export default function ReportHistoryScreen() {
               )}
               {/* Fallback if no roles */}
               {!person.is_regular_pioneer && !person.is_elder && !person.is_ministerial_servant && (
-                <View className="px-2 py-0.5 rounded-full border bg-slate-100 border-slate-200">
-                  <Text className="text-xs font-medium text-slate-700">Publicador</Text>
+                <View className="px-2 py-0.5 rounded-full border bg-surface-input-light dark:bg-surface-input-dark border-border-input-light dark:border-border-input-dark">
+                  <Text className="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark">Publicador</Text>
                 </View>
               )}
             </View>
@@ -234,17 +238,22 @@ export default function ReportHistoryScreen() {
         </View>
 
         {/* Year Selector */}
-        <View className="bg-white rounded-xl p-3 shadow-sm border border-gray-100 flex-row items-center justify-between mb-6">
-          <Text className="text-sm font-medium text-gray-500 uppercase tracking-wide ml-2">Año de Servicio</Text>
-          <View className="flex-row items-center gap-3 bg-slate-50 rounded-lg p-1">
-            <TouchableOpacity onPress={() => setSelectedYear(selectedYear - 1)} className="p-1 rounded-md bg-white shadow-sm">
-              <MaterialIcons name="chevron-left" size={20} color="#64748b" />
+        <View className="bg-card-light dark:bg-card-dark rounded-xl p-3 shadow-sm border border-border-input-light dark:border-border-input-dark flex-row items-center justify-between mb-6">
+          <Text className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide ml-2">
+            Año de Servicio
+          </Text>
+          <View className="flex-row items-center gap-3 bg-surface-input-light dark:bg-surface-input-dark rounded-lg p-1">
+            <TouchableOpacity
+              onPress={() => setSelectedYear(selectedYear - 1)}
+              className="p-1 rounded-md bg-card-light dark:bg-card-dark shadow-sm"
+            >
+              <MaterialIcons name="chevron-left" size={20} color="#64748b" className="dark:text-slate-400" />
             </TouchableOpacity>
-            <Text className="font-bold text-lg text-slate-900">{selectedYear}</Text>
+            <Text className="font-bold text-lg text-text-main-light dark:text-text-main-dark">{selectedYear}</Text>
             <TouchableOpacity
               onPress={() => setSelectedYear(selectedYear + 1)}
               disabled={selectedYear === currentYear}
-              className={`p-1 rounded-md bg-white shadow-sm ${selectedYear === currentYear ? "opacity-50" : ""}`}
+              className={`p-1 rounded-md bg-card-light dark:bg-card-dark shadow-sm ${selectedYear === currentYear ? "opacity-50" : ""}`}
             >
               <MaterialIcons name="chevron-right" size={20} color="#2563eb" />
             </TouchableOpacity>
@@ -254,19 +263,19 @@ export default function ReportHistoryScreen() {
         {/* Stats Grid */}
         {person.is_regular_pioneer && (
           <View className="flex-row gap-3 mb-6">
-            <View className="flex-1 bg-white p-4 rounded-xl shadow-sm border border-gray-100 h-24 justify-between">
+            <View className="flex-1 bg-card-light dark:bg-card-dark p-4 rounded-xl shadow-sm border border-border-input-light dark:border-border-input-dark h-24 justify-between">
               <View className="flex-row justify-between items-start">
-                <Text className="text-xs font-medium text-gray-500 uppercase">Total Horas</Text>
+                <Text className="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase">Total Horas</Text>
                 <MaterialIcons name="schedule" size={20} color="#3b82f6" />
               </View>
-              <Text className="text-2xl font-bold text-slate-900">{totalHours}</Text>
+              <Text className="text-2xl font-bold text-text-main-light dark:text-text-main-dark">{totalHours}</Text>
             </View>
-            <View className="flex-1 bg-white p-4 rounded-xl shadow-sm border border-gray-100 h-24 justify-between">
+            <View className="flex-1 bg-card-light dark:bg-card-dark p-4 rounded-xl shadow-sm border border-border-input-light dark:border-border-input-dark h-24 justify-between">
               <View className="flex-row justify-between items-start">
-                <Text className="text-xs font-medium text-gray-500 uppercase">Promedio</Text>
+                <Text className="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase">Promedio</Text>
                 <MaterialIcons name="trending-up" size={20} color="#22c55e" />
               </View>
-              <Text className="text-2xl font-bold text-slate-900">{averageHours}</Text>
+              <Text className="text-2xl font-bold text-text-main-light dark:text-text-main-dark">{averageHours}</Text>
             </View>
           </View>
         )}
@@ -274,21 +283,28 @@ export default function ReportHistoryScreen() {
         {/* Monthly Details */}
         <View className="gap-3">
           <View className="flex-row items-center justify-between">
-            <Text className="text-lg font-semibold px-1 text-slate-900 mb-1">Detalle Mensual</Text>
-            <Text className="text-xs text-gray-400">
+            <Text className="text-lg font-semibold px-1 text-text-main-light dark:text-text-main-dark mb-1">Detalle Mensual</Text>
+            <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
               Sep {selectedYear - 1} - Ago {selectedYear}
             </Text>
           </View>
 
           {reports.map((report) => (
-            <View key={report.id} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100">
+            <View
+              key={report.id}
+              className="bg-card-light dark:bg-card-dark rounded-xl overflow-hidden shadow-sm border border-border-input-light dark:border-border-input-dark"
+            >
               {report.isFuture === true ? (
-                <View className="flex-row items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
+                <View className="flex-row items-center justify-between p-4 border-b border-border-input-light dark:border-border-input-dark bg-surface-input-light/50 dark:bg-surface-input-dark/20">
                   <View className="flex-row items-center gap-3">
-                    <View className="w-10 h-10 rounded-full bg-slate-100 items-center justify-center">
-                      <Text className="text-slate-300 font-bold text-sm">{shortMonthNames[report.month - 1]}</Text>
+                    <View className="w-10 h-10 rounded-full bg-surface-input-light dark:bg-surface-input-dark items-center justify-center">
+                      <Text className="text-text-secondary-light/40 dark:text-text-secondary-dark/40 font-bold text-sm">
+                        {shortMonthNames[report.month - 1]}
+                      </Text>
                     </View>
-                    <Text className="font-semibold text-lg text-slate-400">{monthNames[report.month - 1]}</Text>
+                    <Text className="font-semibold text-lg text-text-secondary-light/40 dark:text-text-secondary-dark/40">
+                      {monthNames[report.month - 1]}
+                    </Text>
                   </View>
                   <View className="items-end">
                     <MaterialIcons name="lock-outline" size={24} color="#94a3b8" />
@@ -297,18 +313,22 @@ export default function ReportHistoryScreen() {
               ) : report.isCurrent === true ? (
                 <>
                   {/* Card Header */}
-                  <View className="flex-row items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
+                  <View className="flex-row items-center justify-between p-4 border-b border-border-input-light dark:border-border-input-dark bg-surface-input-light/50 dark:bg-surface-input-dark/20">
                     <View className="flex-row items-center gap-3">
                       <View
-                        className={`w-10 h-10 rounded-full ${report.participated ? "bg-blue-100" : "bg-slate-100"} items-center justify-center`}
+                        className={`w-10 h-10 rounded-full ${report.participated ? "bg-blue-100 dark:bg-blue-900/30" : "bg-surface-input-light dark:bg-surface-input-dark"} items-center justify-center`}
                       >
-                        <Text className={`${report.participated ? "text-blue-600" : "text-slate-400"} font-bold text-sm`}>
+                        <Text
+                          className={`${report.participated ? "text-blue-600 dark:text-blue-400" : "text-text-secondary-light/40 dark:text-text-secondary-dark/40"} font-bold text-sm`}
+                        >
                           {shortMonthNames[report.month - 1]}
                         </Text>
                       </View>
-                      <Text className="font-semibold text-lg text-slate-900">{monthNames[report.month - 1]}</Text>
-                      <View className="px-1.5 py-0.5 rounded-full border bg-orange-100 border-orange-200">
-                        <Text className="font-bold uppercase text-orange-600 text-[8px]">Pendiente</Text>
+                      <Text className="font-semibold text-lg text-text-main-light dark:text-text-main-dark">
+                        {monthNames[report.month - 1]}
+                      </Text>
+                      <View className="px-1.5 py-0.5 rounded-full border bg-orange-100 dark:bg-orange-900/30 border-orange-200 dark:border-orange-800">
+                        <Text className="font-bold uppercase text-orange-600 dark:text-orange-400 text-[8px]">Pendiente</Text>
                       </View>
                     </View>
                   </View>
@@ -316,7 +336,7 @@ export default function ReportHistoryScreen() {
                   {/* Stats Row */}
                   <View className="p-4 items-center justify-center">
                     <Link href={`/people/${id}/reports/new`} asChild>
-                      <TouchableOpacity className="flex-row items-center gap-2 bg-blue-50 px-4 py-2 rounded-full active:bg-blue-100">
+                      <TouchableOpacity className="flex-row items-center gap-2 bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-full active:bg-blue-100 dark:active:bg-blue-900/40">
                         <MaterialIcons name="add-circle-outline" size={18} color="#2563eb" />
                         <Text className="text-sm font-semibold text-primary">Ingresar informe</Text>
                       </TouchableOpacity>
@@ -326,29 +346,33 @@ export default function ReportHistoryScreen() {
               ) : (
                 <>
                   {/* Card Header */}
-                  <View className="flex-row items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
+                  <View className="flex-row items-center justify-between p-4 border-b border-border-input-light dark:border-border-input-dark bg-surface-input-light/50 dark:bg-surface-input-dark/20">
                     <View className="flex-row items-center gap-3">
                       <View
-                        className={`w-10 h-10 rounded-full ${report.participated ? "bg-blue-100" : "bg-slate-100"} items-center justify-center`}
+                        className={`w-10 h-10 rounded-full ${report.participated ? "bg-blue-100 dark:bg-blue-900/30" : "bg-surface-input-light dark:bg-surface-input-dark"} items-center justify-center`}
                       >
-                        <Text className={`${report.participated ? "text-blue-600" : "text-slate-400"} font-bold text-sm`}>
+                        <Text
+                          className={`${report.participated ? "text-blue-600 dark:text-blue-400" : "text-text-secondary-light/40 dark:text-text-secondary-dark/40"} font-bold text-sm`}
+                        >
                           {shortMonthNames[report.month - 1]}
                         </Text>
                       </View>
-                      <Text className="font-semibold text-lg text-slate-900">{monthNames[report.month - 1]}</Text>
+                      <Text className="font-semibold text-lg text-text-main-light dark:text-text-main-dark">
+                        {monthNames[report.month - 1]}
+                      </Text>
                     </View>
                     {(report.is_auxiliary_pioneer || person.is_regular_pioneer) && (
                       <View className="items-end">
                         <Text className="text-2xl font-bold text-primary">{report.hours || 0}</Text>
-                        <Text className="text-xs text-gray-400 uppercase font-medium">Horas</Text>
+                        <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark uppercase font-medium">Horas</Text>
                       </View>
                     )}
                   </View>
 
                   {/* Stats Row */}
-                  <View className="p-4 flex-row divide-x divide-slate-100">
+                  <View className="p-4 flex-row divide-x divide-border-input-light dark:divide-border-input-dark">
                     <View className="flex-1 items-center gap-1">
-                      <Text className="text-xs text-gray-500">Ministerio</Text>
+                      <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Ministerio</Text>
                       <MaterialIcons
                         name={report.participated ? "check-circle" : "cancel"}
                         size={20}
@@ -356,22 +380,33 @@ export default function ReportHistoryScreen() {
                       />
                     </View>
                     <View className="flex-1 items-center gap-1">
-                      <Text className="text-xs text-gray-500">Cursos</Text>
-                      <Text className="font-bold text-lg text-slate-900">{report.bible_courses || 0}</Text>
+                      <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Cursos</Text>
+                      <Text className="font-bold text-lg text-text-main-light dark:text-text-main-dark">{report.bible_courses || 0}</Text>
                     </View>
                     {!person.is_regular_pioneer && (
                       <View className="flex-1 items-center gap-1">
-                        <Text className="text-xs text-gray-500">Auxiliar</Text>
-                        <MaterialIcons name="check-circle" size={20} color={report.is_auxiliary_pioneer ? "#3b82f6" : "#cbd5e1"} />
+                        <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Auxiliar</Text>
+                        <MaterialIcons
+                          name="check-circle"
+                          size={20}
+                          color={report.is_auxiliary_pioneer ? "#3b82f6" : "#94a3b8"}
+                          className="dark:text-slate-600"
+                        />
                       </View>
                     )}
                   </View>
 
                   {/* Notes Footer */}
                   {report.notes ? (
-                    <View className="px-4 py-3 bg-slate-50 border-t border-slate-100 flex-row items-start gap-2">
-                      <MaterialIcons name="sticky-note-2" size={16} color="#64748b" style={{ marginTop: 2 }} />
-                      <Text className="text-sm text-slate-600 flex-1">{report.notes}</Text>
+                    <View className="px-4 py-3 bg-surface-input-light dark:bg-surface-input-dark border-t border-border-input-light dark:border-border-input-dark flex-row items-start gap-2">
+                      <MaterialIcons
+                        name="sticky-note-2"
+                        size={16}
+                        color="#64748b"
+                        className="dark:text-slate-400"
+                        style={{ marginTop: 2 }}
+                      />
+                      <Text className="text-sm text-text-secondary-light dark:text-text-secondary-dark flex-1">{report.notes}</Text>
                     </View>
                   ) : null}
                 </>

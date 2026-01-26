@@ -38,7 +38,9 @@ const FilterBar: React.FC<FilterBarProps> = ({ categories, activeCategory, onSel
               onPress={() => onSelectCategory(key === "Todos" ? undefined : key)}
               activeOpacity={0.7}
               className={`flex-row items-center justify-center px-6 py-2.5 rounded-xl border transition-all ${
-                isActive ? "bg-primary border-primary" : "bg-white border-slate-200"
+                isActive
+                  ? "bg-primary border-primary"
+                  : "bg-card-light dark:bg-card-dark border-border-input-light dark:border-border-input-dark"
               }`}
               style={
                 isActive
@@ -52,7 +54,11 @@ const FilterBar: React.FC<FilterBarProps> = ({ categories, activeCategory, onSel
                   : {}
               }
             >
-              <Text className={`text-sm font-bold whitespace-nowrap ${isActive ? "text-white" : "text-slate-600"}`}>{value}</Text>
+              <Text
+                className={`text-sm font-bold whitespace-nowrap ${isActive ? "text-white" : "text-text-secondary-light dark:text-text-secondary-dark"}`}
+              >
+                {value}
+              </Text>
             </TouchableOpacity>
           );
         })}

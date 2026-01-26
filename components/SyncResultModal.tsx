@@ -1,5 +1,5 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { Modal, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Modal, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 interface PersonSyncItem {
   id: number;
@@ -13,218 +13,101 @@ interface SyncResultModalProps {
   toDeactivate: PersonSyncItem[];
 }
 
-const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 16,
-  },
-  modalContent: {
-    backgroundColor: "white",
-    borderRadius: 16,
-    width: "100%",
-    maxWidth: 500,
-    maxHeight: "80%",
-    ...Platform.select({
-      ios: {
-        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-      },
-      android: {
-        elevation: 8,
-      },
-      web: {
-        boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
-      },
-    }),
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f1f5f9",
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#0f172a",
-    flex: 1,
-  },
-  closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#f1f5f9",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  body: {
-    padding: 20,
-  },
-  statsContainer: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 20,
-  },
-  statCard: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  statCardActivated: {
-    backgroundColor: "#f0fdf4",
-    borderColor: "#bbf7d0",
-  },
-  statCardDeactivated: {
-    backgroundColor: "#fef2f2",
-    borderColor: "#fecaca",
-  },
-  statLabel: {
-    fontSize: 12,
-    fontWeight: "600",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    marginBottom: 4,
-  },
-  statLabelActivated: {
-    color: "#16a34a",
-  },
-  statLabelDeactivated: {
-    color: "#dc2626",
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: "700",
-  },
-  statValueActivated: {
-    color: "#15803d",
-  },
-  statValueDeactivated: {
-    color: "#b91c1c",
-  },
-  section: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#64748b",
-    marginBottom: 12,
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-  },
-  listContainer: {
-    maxHeight: 200,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    backgroundColor: "#f8fafc",
-  },
-  listItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e2e8f0",
-  },
-  listItemLast: {
-    borderBottomWidth: 0,
-  },
-  listItemText: {
-    fontSize: 14,
-    color: "#334155",
-    marginLeft: 8,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: "#94a3b8",
-    textAlign: "center",
-    padding: 16,
-    fontStyle: "italic",
-  },
-  warningMessage: {
-    fontSize: 12,
-    color: "#d97706",
-    backgroundColor: "#fef3c7",
-    padding: 8,
-    borderRadius: 6,
-    marginBottom: 12,
-    fontWeight: "600",
-    borderLeftWidth: 3,
-    borderLeftColor: "#f59e0b",
-  },
-});
-
 export default function SyncResultModal({ visible, onClose, toActivate, toDeactivate }: SyncResultModalProps) {
   const activatedCount = toActivate.length;
   const deactivatedCount = toDeactivate.length;
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
+      <View className="flex-1 bg-black/50 justify-center items-center p-4">
+        <View
+          style={{
+            ...Platform.select({
+              ios: { boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)" },
+              android: { elevation: 8 },
+              web: { boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)" },
+            }),
+          }}
+          className="bg-background-light dark:bg-card-dark rounded-2xl w-full max-w-[500px] max-h-[80%] overflow-hidden"
+        >
           {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.headerTitle}>Resultado de Sincronización</Text>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose} activeOpacity={0.7}>
-              <MaterialIcons name="close" size={20} color="#64748b" />
+          <View className="flex-row items-center justify-between p-5 border-b border-border-input-light dark:border-border-input-dark">
+            <Text className="text-lg font-bold text-text-main-light dark:text-text-main-dark flex-1">Resultado de Sincronización</Text>
+            <TouchableOpacity
+              className="w-8 h-8 rounded-full bg-surface-input-light dark:bg-surface-input-dark items-center justify-center"
+              onPress={onClose}
+              activeOpacity={0.7}
+            >
+              <MaterialIcons name="close" size={20} color="#64748b" className="dark:text-slate-400" />
             </TouchableOpacity>
           </View>
 
           {/* Body */}
-          <ScrollView style={styles.body} showsVerticalScrollIndicator={false}>
+          <ScrollView className="p-5" showsVerticalScrollIndicator={false}>
             {/* Stats Cards */}
-            <View style={styles.statsContainer}>
-              <View style={[styles.statCard, styles.statCardActivated]}>
-                <Text style={[styles.statLabel, styles.statLabelActivated]}>Activados</Text>
-                <Text style={[styles.statValue, styles.statValueActivated]}>{activatedCount}</Text>
+            <View className="flex-row gap-3 mb-5">
+              <View className="flex-1 p-4 rounded-xl border border-green-200 dark:border-green-900/30 bg-green-50 dark:bg-green-500/10">
+                <Text className="text-[10px] font-bold uppercase tracking-wider mb-1 text-green-600 dark:text-green-400">Activados</Text>
+                <Text className="text-2xl font-bold text-green-800 dark:text-green-300">{activatedCount}</Text>
               </View>
-              <View style={[styles.statCard, styles.statCardDeactivated]}>
-                <Text style={[styles.statLabel, styles.statLabelDeactivated]}>Desactivados</Text>
-                <Text style={[styles.statValue, styles.statValueDeactivated]}>{deactivatedCount}</Text>
+              <View className="flex-1 p-4 rounded-xl border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-500/10">
+                <Text className="text-[10px] font-bold uppercase tracking-wider mb-1 text-red-600 dark:text-red-400">Desactivados</Text>
+                <Text className="text-2xl font-bold text-red-800 dark:text-red-300">{deactivatedCount}</Text>
               </View>
             </View>
 
             {/* Activated List */}
             {activatedCount > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Personas por activar</Text>
-                <Text style={styles.warningMessage}>
+              <View className="mb-5">
+                <Text className="text-sm font-bold text-text-secondary-light dark:text-text-secondary-dark mb-3 uppercase tracking-wider">
+                  Personas por activar
+                </Text>
+                <Text className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 p-2 rounded-lg mb-3 font-semibold border-l-2 border-amber-500">
                   ⚠️ Estos publicadores deben ser activados manualmente.{"\n"}Recuerda que deben tener la aprobación del comité de servicio.
                 </Text>
-                <ScrollView style={styles.listContainer} nestedScrollEnabled showsVerticalScrollIndicator={true}>
-                  {toActivate.map((person, index) => (
-                    <View key={person.id} style={[styles.listItem, index === toActivate.length - 1 && styles.listItemLast]}>
-                      <MaterialIcons name="check-circle" size={18} color="#16a34a" />
-                      <Text style={styles.listItemText}>{person.name}</Text>
-                    </View>
-                  ))}
-                </ScrollView>
+                <View className="max-h-52 rounded-lg border border-border-input-light dark:border-border-input-dark bg-surface-input-light dark:bg-slate-900/50">
+                  <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={true}>
+                    {toActivate.map((person, index) => (
+                      <View
+                        key={person.id}
+                        className={`flex-row items-center p-3 border-b border-border-input-light dark:border-border-input-dark ${index === toActivate.length - 1 ? "border-b-0" : ""}`}
+                      >
+                        <MaterialIcons name="check-circle" size={18} color="#16a34a" />
+                        <Text className="text-sm text-text-main-light dark:text-text-main-dark ml-2">{person.name}</Text>
+                      </View>
+                    ))}
+                  </ScrollView>
+                </View>
               </View>
             )}
 
             {/* Deactivated List */}
             {deactivatedCount > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Personas desactivadas</Text>
-                <ScrollView style={styles.listContainer} nestedScrollEnabled showsVerticalScrollIndicator={true}>
-                  {toDeactivate.map((person, index) => (
-                    <View key={person.id} style={[styles.listItem, index === toDeactivate.length - 1 && styles.listItemLast]}>
-                      <MaterialIcons name="cancel" size={18} color="#dc2626" />
-                      <Text style={styles.listItemText}>{person.name}</Text>
-                    </View>
-                  ))}
-                </ScrollView>
+              <View className="mb-5">
+                <Text className="text-sm font-bold text-text-secondary-light dark:text-text-secondary-dark mb-3 uppercase tracking-wider">
+                  Personas desactivadas
+                </Text>
+                <View className="max-h-52 rounded-lg border border-border-input-light dark:border-border-input-dark bg-surface-input-light dark:bg-slate-900/50">
+                  <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={true}>
+                    {toDeactivate.map((person, index) => (
+                      <View
+                        key={person.id}
+                        className={`flex-row items-center p-3 border-b border-border-input-light dark:border-border-input-dark ${index === toDeactivate.length - 1 ? "border-b-0" : ""}`}
+                      >
+                        <MaterialIcons name="cancel" size={18} color="#dc2626" />
+                        <Text className="text-sm text-text-main-light dark:text-text-main-dark ml-2">{person.name}</Text>
+                      </View>
+                    ))}
+                  </ScrollView>
+                </View>
               </View>
             )}
 
             {/* Empty State */}
             {activatedCount === 0 && deactivatedCount === 0 && (
-              <Text style={styles.emptyText}>No se realizaron cambios en el estado de las personas.</Text>
+              <Text className="text-sm text-text-secondary-light dark:text-text-secondary-dark text-center p-4 italic">
+                No se realizaron cambios en el estado de las personas.
+              </Text>
             )}
           </ScrollView>
         </View>

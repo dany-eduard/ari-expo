@@ -26,8 +26,8 @@ const styles = StyleSheet.create({
   },
 });
 
-const MaterialIcon = ({ name, size = 24, color }: { name: string; size?: number; color?: string }) => {
-  return <MaterialIcons name={name as any} size={size} color={color} />;
+const MaterialIcon = ({ name, size = 24, color, className }: { name: string; size?: number; color?: string; className?: string }) => {
+  return <MaterialIcons name={name as any} size={size} color={color} className={className} />;
 };
 
 export default function HomeScreen() {
@@ -129,12 +129,12 @@ export default function HomeScreen() {
     <ThemedView style={{ flex: 1 }}>
       <SafeAreaView edges={["top"]} style={{ backgroundColor: "transparent" }}>
         {/* Sticky Header */}
-        <View className="flex-row items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-background-light dark:bg-background-dark">
+        <View className="flex-row items-center justify-between p-4 border-b border-border-input-light dark:border-border-input-dark bg-background-light dark:bg-background-dark">
           <View className="flex-row items-center gap-3">
-            <Text className="text-xl font-bold tracking-tight">Inicio</Text>
+            <Text className="text-xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark">Inicio</Text>
           </View>
           <TouchableOpacity className="h-10 w-10 items-center justify-center rounded-full">
-            <MaterialIcon name="notifications-none" size={24} color="#64748b" />
+            <MaterialIcon name="notifications-none" size={24} color="#64748b" className="dark:text-slate-400" />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -142,12 +142,14 @@ export default function HomeScreen() {
       <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 10 }} showsVerticalScrollIndicator={false}>
         {/* Profile Section */}
         <View className="flex-row items-center gap-4 px-4 pt-4 pb-6">
-          <View className="h-16 w-16 rounded-full border-2 border-slate-200 items-center justify-center">
-            <MaterialIcon name="person" size={40} color="#64748b" />
+          <View className="h-16 w-16 rounded-full border-2 border-border-input-light dark:border-border-input-dark items-center justify-center">
+            <MaterialIcon name="person" size={40} color="#64748b" className="dark:text-slate-400" />
           </View>
           <View>
-            <Text className="text-2xl font-bold tracking-tight">Hola, {user?.first_name}</Text>
-            <Text className="text-sm font-medium text-slate-500 dark:text-slate-400">
+            <Text className="text-2xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark">
+              Hola, {user?.first_name}
+            </Text>
+            <Text className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">
               {`${new Date().getDate()} de ${new Date().toLocaleString("es-ES", { month: "long" }).replace(/^\w/, (c) => c.toUpperCase())}, ${new Date().getFullYear()}`}
             </Text>
           </View>
@@ -215,27 +217,27 @@ export default function HomeScreen() {
 
         {/* Quick Actions */}
         <View className="px-4 pb-2">
-          <Text className="text-lg font-bold mb-4">Acciones rápidas</Text>
+          <Text className="text-lg font-bold mb-4 text-text-main-light dark:text-text-main-dark">Acciones rápidas</Text>
           <View className="flex-row gap-4">
             <TouchableOpacity
               activeOpacity={0.7}
-              className="flex-1 items-center justify-center gap-3 p-4 rounded-xl bg-card border border-slate-200 dark:border-slate-800"
+              className="flex-1 items-center justify-center gap-3 p-4 rounded-xl bg-card-light dark:bg-card-dark border border-border-input-light dark:border-border-input-dark"
               onPress={() => router.push("/people/0/reports/new")}
             >
               <View className="bg-primary/10 p-3 rounded-full">
                 <MaterialIcon name="post-add" size={24} color="#2563eb" />
               </View>
-              <Text className="text-sm font-medium text-slate-600 dark:text-slate-200">Registrar informe</Text>
+              <Text className="text-sm font-medium text-text-main-light dark:text-text-main-dark">Registrar informe</Text>
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.7}
-              className="flex-1 items-center justify-center gap-3 p-4 rounded-xl bg-card border border-slate-200 dark:border-slate-800"
+              className="flex-1 items-center justify-center gap-3 p-4 rounded-xl bg-card-light dark:bg-card-dark border border-border-input-light dark:border-border-input-dark"
               onPress={() => router.push("/people/new")}
             >
               <View className="bg-indigo-50 dark:bg-indigo-500/10 p-3 rounded-full">
                 <MaterialIcon name="person-add" size={24} color="#4f46e5" />
               </View>
-              <Text className="text-sm font-medium text-slate-600 dark:text-slate-200">Nueva persona</Text>
+              <Text className="text-sm font-medium text-text-main-light dark:text-text-main-dark">Nueva persona</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -244,43 +246,45 @@ export default function HomeScreen() {
         <View className={`flex-row flex-wrap gap-2 px-4 py-3 ${isSmallScreen ? "flex-col" : "flex-row"}`}>
           <View
             style={styles.floatingCard}
-            className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800`}
+            className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-card-light dark:bg-card-dark border border-border-input-light dark:border-border-input-dark`}
           >
             <View className="flex-row items-center justify-between">
               <View className="p-2 bg-purple-100 dark:bg-purple-500/10 rounded-lg">
                 <MaterialIcon name="groups" size={20} color="#a855f7" />
               </View>
               <View className="items-end">
-                <Text className="text-lg font-bold dark:text-white">{homeData?.total_teams || 0}</Text>
-                <Text className="text-slate-500 dark:text-slate-400 text-[10px] font-medium">Grupos</Text>
+                <Text className="text-lg font-bold text-text-main-light dark:text-text-main-dark">{homeData?.total_teams || 0}</Text>
+                <Text className="text-text-secondary-light dark:text-text-secondary-dark text-[10px] font-medium">Grupos</Text>
               </View>
             </View>
           </View>
           <View
             style={styles.floatingCard}
-            className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800`}
+            className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-card-light dark:bg-card-dark border border-border-input-light dark:border-border-input-dark`}
           >
             <View className="flex-row items-center justify-between">
               <View className="p-2 bg-orange-100 dark:bg-orange-500/10 rounded-lg">
                 <MaterialIcon name="diversity-3" size={20} color="#f97316" />
               </View>
               <View className="items-end">
-                <Text className="text-lg font-bold dark:text-white">{homeData?.total_people || 0}</Text>
-                <Text className="text-slate-500 dark:text-slate-400 text-[10px] font-medium">Personas</Text>
+                <Text className="text-lg font-bold text-text-main-light dark:text-text-main-dark">{homeData?.total_people || 0}</Text>
+                <Text className="text-text-secondary-light dark:text-text-secondary-dark text-[10px] font-medium">Personas</Text>
               </View>
             </View>
           </View>
           <View
             style={styles.floatingCard}
-            className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800`}
+            className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-card-light dark:bg-card-dark border border-border-input-light dark:border-border-input-dark`}
           >
             <View className="flex-row items-center justify-between">
               <View className="p-2 bg-green-100 dark:bg-green-500/10 rounded-lg">
                 <MaterialIcon name="checklist" size={20} color="#10b981" />
               </View>
               <View className="items-end">
-                <Text className="text-lg font-bold dark:text-white">{homeData?.total_active_people || 0}</Text>
-                <Text className="text-slate-500 dark:text-slate-400 text-[10px] font-medium">Activos</Text>
+                <Text className="text-lg font-bold text-text-main-light dark:text-text-main-dark">
+                  {homeData?.total_active_people || 0}
+                </Text>
+                <Text className="text-text-secondary-light dark:text-text-secondary-dark text-[10px] font-medium">Activos</Text>
               </View>
             </View>
           </View>
@@ -288,27 +292,31 @@ export default function HomeScreen() {
 
         {/* Predication Summary Section */}
         <View className="px-4 pt-2">
-          <Text className="text-lg font-bold mb-3 dark:text-white">Resumen de predicación</Text>
+          <Text className="text-lg font-bold mb-3 text-text-main-light dark:text-text-main-dark">Resumen de predicación</Text>
           <View className={`flex-row flex-wrap gap-2 pb-3 ${isSmallScreen ? "flex-col" : "flex-row"}`}>
             {/* Publicadores */}
             <View
               style={styles.floatingCard}
-              className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800`}
+              className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-card-light dark:bg-card-dark border border-border-input-light dark:border-border-input-dark`}
             >
               <View className="flex-row items-center gap-1.5 mb-2">
                 <MaterialIcon name="description" size={16} color="#3b82f6" />
-                <Text className="text-xs font-bold dark:text-white" numberOfLines={1}>
+                <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark" numberOfLines={1}>
                   Publicadores
                 </Text>
               </View>
               <View className="gap-1">
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-slate-500 text-xs">Informes</Text>
-                  <Text className="text-xs font-bold dark:text-white">{homeData?.summary?.publishers?.reports || 0}</Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Informes</Text>
+                  <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
+                    {homeData?.summary?.publishers?.reports || 0}
+                  </Text>
                 </View>
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-slate-500 text-xs">Cursos bíblicos</Text>
-                  <Text className="text-xs font-bold dark:text-white">{homeData?.summary?.publishers?.bible_courses || 0}</Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Cursos bíblicos</Text>
+                  <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
+                    {homeData?.summary?.publishers?.bible_courses || 0}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -316,26 +324,32 @@ export default function HomeScreen() {
             {/* Auxiliares */}
             <View
               style={styles.floatingCard}
-              className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800`}
+              className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-card-light dark:bg-card-dark border border-border-input-light dark:border-border-input-dark`}
             >
               <View className="flex-row items-center gap-1.5 mb-2">
                 <MaterialIcon name="access-time" size={16} color="#f59e0b" />
-                <Text className="text-xs font-bold dark:text-white" numberOfLines={1}>
+                <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark" numberOfLines={1}>
                   Auxiliares
                 </Text>
               </View>
               <View className="gap-1">
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-slate-500 text-xs">Informes</Text>
-                  <Text className="text-xs font-bold dark:text-white">{homeData?.summary?.auxiliary_pioneers?.reports || 0}</Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Informes</Text>
+                  <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
+                    {homeData?.summary?.auxiliary_pioneers?.reports || 0}
+                  </Text>
                 </View>
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-slate-500 text-xs">Horas</Text>
-                  <Text className="text-xs font-bold dark:text-white">{homeData?.summary?.auxiliary_pioneers?.hours || 0}</Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Horas</Text>
+                  <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
+                    {homeData?.summary?.auxiliary_pioneers?.hours || 0}
+                  </Text>
                 </View>
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-slate-500 text-xs">Cursos bíblicos</Text>
-                  <Text className="text-xs font-bold dark:text-white">{homeData?.summary?.auxiliary_pioneers?.bible_courses || 0}</Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Cursos bíblicos</Text>
+                  <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
+                    {homeData?.summary?.auxiliary_pioneers?.bible_courses || 0}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -343,26 +357,32 @@ export default function HomeScreen() {
             {/* Regulares */}
             <View
               style={styles.floatingCard}
-              className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-white dark:bg-slate-900 border border-slate-50 dark:border-slate-800`}
+              className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-card-light dark:bg-card-dark border border-border-input-light dark:border-border-input-dark`}
             >
               <View className="flex-row items-center gap-1.5 mb-2">
                 <MaterialIcon name="verified" size={16} color="#14b8a6" />
-                <Text className="text-xs font-bold dark:text-white" numberOfLines={1}>
+                <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark" numberOfLines={1}>
                   Regulares
                 </Text>
               </View>
               <View className="gap-1">
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-slate-500 text-xs">Informes</Text>
-                  <Text className="text-xs font-bold dark:text-white">{homeData?.summary?.regular_pioneers?.reports || 0}</Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Informes</Text>
+                  <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
+                    {homeData?.summary?.regular_pioneers?.reports || 0}
+                  </Text>
                 </View>
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-slate-500 text-xs">Horas</Text>
-                  <Text className="text-xs font-bold dark:text-white">{homeData?.summary?.regular_pioneers?.hours || 0}</Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Horas</Text>
+                  <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
+                    {homeData?.summary?.regular_pioneers?.hours || 0}
+                  </Text>
                 </View>
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-slate-500 text-xs">Cursos bíblicos</Text>
-                  <Text className="text-xs font-bold dark:text-white">{homeData?.summary?.regular_pioneers?.bible_courses || 0}</Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Cursos bíblicos</Text>
+                  <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
+                    {homeData?.summary?.regular_pioneers?.bible_courses || 0}
+                  </Text>
                 </View>
               </View>
             </View>

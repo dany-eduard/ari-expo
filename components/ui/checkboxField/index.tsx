@@ -15,12 +15,14 @@ const CheckboxField: React.FC<CheckboxFieldProps> = ({ label, value, onChange, d
       onPress={() => onChange(!value)}
       activeOpacity={0.7}
       disabled={disabled}
-      className="flex flex-row items-center justify-between p-3.5 rounded-xl bg-white border border-slate-200 shadow-sm active:scale-[0.99] transition-transform"
+      className="flex flex-row items-center justify-between p-3.5 rounded-xl bg-card-light dark:bg-card-dark border border-border-input-light dark:border-border-input-dark shadow-sm active:scale-[0.99] transition-transform"
     >
-      <Text className="text-slate-900 font-medium ml-1">{label}</Text>
+      <Text className="text-text-main-light dark:text-text-main-dark font-medium ml-1">{label}</Text>
       <View
         className={`h-6 w-6 rounded-lg border-2 items-center justify-center ${
-          value ? "bg-primary border-primary" : "bg-slate-50 border-slate-300"
+          value
+            ? "bg-primary border-primary"
+            : "bg-surface-input-light dark:bg-surface-input-dark border-border-input-light dark:border-border-input-dark"
         }`}
       >
         {value && <MaterialIcons name="check" size={16} color="white" />}

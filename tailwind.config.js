@@ -7,12 +7,25 @@ module.exports = {
     extend: {
       colors: {
         primary: "#2563eb", // Blue 600
+        "background-light": "#ffffff",
+        "background-dark": "#0f172a",
+        "card-light": "#ffffff",
+        "card-dark": "#1e293b",
+        "surface-input-light": "#f8fafc",
+        "surface-input-dark": "#334155",
+        "border-input-light": "#e2e8f0",
+        "border-input-dark": "#475569",
+        "text-main-light": "#0f172a",
+        "text-main-dark": "#f1f5f9",
+        "text-secondary-light": "#64748b",
+        "text-secondary-dark": "#94a3b8",
+        // Keep these for backward compatibility if used
         "background-page": "#ffffff",
         card: "#ffffff",
-        "surface-input": "#f8fafc", // Slate 50
-        "border-input": "#e2e8f0", // Slate 200
-        "text-main": "#0f172a", // Slate 900
-        "text-secondary": "#64748b", // Slate 500
+        "surface-input": "#f8fafc",
+        "border-input": "#e2e8f0",
+        "text-main": "#0f172a",
+        "text-secondary": "#64748b",
       },
       fontFamily: {
         display: ["Inter", "sans-serif"],

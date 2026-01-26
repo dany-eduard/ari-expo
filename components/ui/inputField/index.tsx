@@ -37,18 +37,18 @@ const InputField: React.FC<InputFieldProps> = ({
 
   return (
     <View className="flex flex-col gap-2">
-      <Text className="text-text-main text-sm font-medium ml-1">{label}</Text>
+      <Text className="text-text-main-light dark:text-text-main-dark text-sm font-medium ml-1">{label}</Text>
       <View className="relative w-full">
         {hasLeftIcon && (
           <View className="absolute left-4 top-0 h-full justify-center z-10 pointer-events-none">
-            <MaterialIcons name={icon as any} size={20} color="#9BA1A6" />
+            <MaterialIcons name={icon as any} size={20} color="#9BA1A6" className="dark:text-slate-400" />
           </View>
         )}
 
         <TextInput
-          className={`w-full rounded-xl border border-border-input bg-surface-input h-14 ${
+          className={`w-full rounded-xl border border-border-input-light dark:border-border-input-dark bg-surface-input-light dark:bg-surface-input-dark h-14 ${
             hasLeftIcon ? "pl-12" : "pl-4"
-          } ${hasRightIcon ? "pr-12" : "pr-4"} text-base text-text-main focus:border-primary transition-all shadow-sm`}
+          } ${hasRightIcon ? "pr-12" : "pr-4"} text-base text-text-main-light dark:text-text-main-dark focus:border-primary transition-all shadow-sm`}
           placeholder={placeholder}
           placeholderTextColor="#64748b80"
           value={value}
@@ -62,7 +62,7 @@ const InputField: React.FC<InputFieldProps> = ({
 
         {icon && iconPosition === "right" && !showToggle && (
           <View className="absolute right-4 top-0 h-full justify-center z-10 pointer-events-none">
-            <MaterialIcons name={icon as any} size={20} color="#9BA1A6" />
+            <MaterialIcons name={icon as any} size={20} color="#9BA1A6" className="dark:text-slate-400" />
           </View>
         )}
 
@@ -72,7 +72,7 @@ const InputField: React.FC<InputFieldProps> = ({
             className="absolute right-0 top-0 h-full w-12 flex items-center justify-center"
             activeOpacity={0.7}
           >
-            <MaterialIcons name={isVisible ? "visibility-off" : "visibility"} size={20} color="#9BA1A6" />
+            <MaterialIcons name={isVisible ? "visibility-off" : "visibility"} size={20} color="#9BA1A6" className="dark:text-slate-400" />
           </TouchableOpacity>
         )}
       </View>

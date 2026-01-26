@@ -13,13 +13,13 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   Switch,
   Text,
   TextInput,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -42,11 +42,11 @@ const SelectionModal = ({
   <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
     <View className="flex-1 bg-black/40 justify-end">
       <Pressable className="flex-1" onPress={onClose} />
-      <View className="bg-white rounded-t-3xl overflow-hidden pb-8 max-h-[70%]">
-        <View className="p-5 border-b border-slate-100 flex-row items-center justify-between">
-          <Text className="text-slate-900 text-lg font-bold">{title}</Text>
+      <View className="bg-background-light dark:bg-background-dark rounded-t-3xl overflow-hidden pb-8 max-h-[70%]">
+        <View className="p-5 border-b border-border-input-light dark:border-border-input-dark flex-row items-center justify-between">
+          <Text className="text-text-main-light dark:text-text-main-dark text-lg font-bold">{title}</Text>
           <TouchableOpacity onPress={onClose} className="p-1">
-            <MaterialIcons name="close" size={24} color="#64748b" />
+            <MaterialIcons name="close" size={24} color="#64748b" className="dark:text-slate-400" />
           </TouchableOpacity>
         </View>
         <FlatList
@@ -58,9 +58,13 @@ const SelectionModal = ({
                 onSelect(item.value);
                 onClose();
               }}
-              className={`p-5 flex-row items-center justify-between ${item.value === currentValue ? "bg-primary/5" : ""}`}
+              className={`p-5 flex-row items-center justify-between ${item.value === currentValue ? "bg-primary/5 dark:bg-primary/10" : ""}`}
             >
-              <Text className={`text-base ${item.value === currentValue ? "text-primary font-bold" : "text-slate-900"}`}>{item.label}</Text>
+              <Text
+                className={`text-base ${item.value === currentValue ? "text-primary font-bold" : "text-text-main-light dark:text-text-main-dark"}`}
+              >
+                {item.label}
+              </Text>
               {item.value === currentValue && <MaterialIcons name="check-circle" size={24} color="#2563eb" />}
             </TouchableOpacity>
           )}
@@ -146,6 +150,7 @@ export default function NewReportScreen() {
   const { user } = useSession();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
 
   const [modalType, setModalType] = useState<"publisher" | "month" | "year" | null>(null);
   const [publishers, setPublishers] = useState<{ label: string; value: string }[]>([]);
@@ -252,7 +257,7 @@ export default function NewReportScreen() {
   if (isLoading) return <Loading />;
 
   return (
-    <View className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-background-light dark:bg-background-dark">
       {/* Selection Modals */}
       <SelectionModal
         visible={modalType === "publisher"}
@@ -283,13 +288,19 @@ export default function NewReportScreen() {
       />
 
       {/* Header */}
-      <View className="bg-white/95 border-b border-gray-200 z-50" style={{ paddingTop: insets.top }}>
+      <View
+        className="bg-background-light/95 dark:bg-card-dark/95 border-b border-border-input-light dark:border-border-input-dark z-50"
+        style={{ paddingTop: insets.top }}
+      >
         <View className="flex-row items-center justify-between px-4 h-[60px] relative">
           <TouchableOpacity onPress={() => router.back()} className="flex items-center active:opacity-60 z-10">
             <Text className="text-primary text-[17px] font-normal">Cancelar</Text>
           </TouchableOpacity>
           <View className="absolute top-0 left-0 right-0 bottom-0 items-center justify-center" pointerEvents="none">
-            <Text className="text-[17px] font-semibold text-center text-slate-900 w-full max-w-[200px]" numberOfLines={1}>
+            <Text
+              className="text-[17px] font-semibold text-center text-text-main-light dark:text-text-main-dark w-full max-w-[200px]"
+              numberOfLines={1}
+            >
               Informe Mensual
             </Text>
           </View>
@@ -302,9 +313,11 @@ export default function NewReportScreen() {
           <View className="flex-col gap-6">
             {/* Periodo y Publicador */}
             <View className="flex-col gap-2">
-              <Text className="text-xs font-medium text-gray-500 uppercase tracking-wider ml-1">Periodo y Publicador</Text>
+              <Text className="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider ml-1">
+                Periodo y Publicador
+              </Text>
 
-              <View className="flex-col bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 divide-y divide-gray-100">
+              <View className="flex-col bg-card-light dark:bg-card-dark rounded-xl overflow-hidden shadow-sm border border-border-input-light dark:border-border-input-dark divide-y divide-border-input-light dark:divide-border-input-dark">
                 {/* Publisher */}
                 <TouchableOpacity
                   onPress={() => setModalType("publisher")}
@@ -313,13 +326,15 @@ export default function NewReportScreen() {
                 >
                   <MaterialIcons name="person" size={24} color="#9ca3af" style={{ marginRight: 12 }} />
                   <View className="flex-1">
-                    <Text className="text-xs text-gray-500 block mb-0.5">Publicador</Text>
+                    <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark block mb-0.5">Publicador</Text>
                     {currentPublisher?.first_name ? (
-                      <Text className="text-base font-medium text-slate-900">
+                      <Text className="text-base font-medium text-text-main-light dark:text-text-main-dark">
                         {currentPublisher?.first_name?.trim() + " " + currentPublisher?.last_name?.trim()}
                       </Text>
                     ) : (
-                      <Text className="text-base font-medium text-gray-400">Selecciona a un publicador</Text>
+                      <Text className="text-base font-medium text-text-secondary-light/60 dark:text-text-secondary-dark/60">
+                        Selecciona a un publicador
+                      </Text>
                     )}
                   </View>
                   <MaterialIcons name="expand-more" size={24} color="#9ca3af" />
@@ -334,8 +349,8 @@ export default function NewReportScreen() {
                   >
                     <MaterialIcons name="calendar-today" size={24} color="#9ca3af" style={{ marginRight: 12 }} />
                     <View className="flex-1">
-                      <Text className="text-xs text-gray-500 block mb-0.5">Mes</Text>
-                      <Text className="text-base font-medium text-slate-900">{currentMonth}</Text>
+                      <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark block mb-0.5">Mes</Text>
+                      <Text className="text-base font-medium text-text-main-light dark:text-text-main-dark">{currentMonth}</Text>
                     </View>
                   </TouchableOpacity>
 
@@ -345,8 +360,8 @@ export default function NewReportScreen() {
                     className="relative w-1/3 flex-row items-center p-4"
                   >
                     <View className="flex-1">
-                      <Text className="text-xs text-gray-500 block mb-0.5">Año</Text>
-                      <Text className="text-base font-medium text-slate-900">{formData.year}</Text>
+                      <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark block mb-0.5">Año</Text>
+                      <Text className="text-base font-medium text-text-main-light dark:text-text-main-dark">{formData.year}</Text>
                     </View>
                   </TouchableOpacity>
                 </View>
@@ -366,15 +381,17 @@ export default function NewReportScreen() {
                       style={{ marginRight: 12 }}
                     />
                     <View className="flex-col">
-                      <Text className="text-sm font-medium text-slate-900">
+                      <Text className="text-sm font-medium text-text-main-light dark:text-text-main-dark">
                         {isRegularPioneer ? "Precursor Regular" : "Precursor Auxiliar"}
                       </Text>
-                      {!isRegularPioneer && <Text className="text-xs text-gray-500">Marcar si aplica este mes</Text>}
+                      {!isRegularPioneer && (
+                        <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Marcar si aplica este mes</Text>
+                      )}
                     </View>
                   </View>
                   {!isRegularPioneer && (
                     <View
-                      className={`w-5 h-5 rounded border items-center justify-center ${formData.isAuxiliaryPioneer ? "bg-primary border-primary" : "border-gray-300"}`}
+                      className={`w-5 h-5 rounded border items-center justify-center ${formData.isAuxiliaryPioneer ? "bg-primary border-primary" : "border-border-input-light dark:border-border-input-dark"}`}
                     >
                       {formData.isAuxiliaryPioneer && <MaterialIcons name="check" size={16} color="white" />}
                     </View>
@@ -385,9 +402,11 @@ export default function NewReportScreen() {
 
             {/* Actividad del Mes */}
             <View className="flex-col gap-2">
-              <Text className="text-xs font-medium text-gray-500 uppercase tracking-wider ml-1">Actividad del Mes</Text>
+              <Text className="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider ml-1">
+                Actividad del Mes
+              </Text>
 
-              <View className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden divide-y divide-gray-100">
+              <View className="bg-card-light dark:bg-card-dark rounded-2xl border border-border-input-light dark:border-border-input-dark shadow-sm overflow-hidden divide-y divide-border-input-light dark:divide-border-input-dark">
                 {/* Participation / Hours */}
                 {isRegularPioneer || formData.isAuxiliaryPioneer ? (
                   <View className="flex-row items-center justify-between p-5">
@@ -396,15 +415,18 @@ export default function NewReportScreen() {
                         <MaterialIcons name="schedule" size={28} color="#2563eb" />
                       </View>
                       <View>
-                        <Text className="text-base font-semibold text-slate-900 block">Horas en el ministerio</Text>
-                        <Text className="text-xs text-gray-500">Horas predicadas este mes</Text>
+                        <Text className="text-base font-semibold text-text-main-light dark:text-text-main-dark block">
+                          Horas en el ministerio
+                        </Text>
+                        <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Horas predicadas este mes</Text>
                       </View>
                     </View>
-                    <View className="bg-gray-100 rounded-lg px-2 w-20">
+                    <View className="bg-surface-input-light dark:bg-surface-input-dark rounded-lg px-2 w-20">
                       <TextInput
-                        className="text-right font-bold text-lg text-slate-900 p-2"
+                        className="text-right font-bold text-lg text-text-main-light dark:text-text-main-dark p-2"
                         keyboardType="numeric"
                         placeholder="0"
+                        placeholderTextColor="#9ca3af80"
                         value={formData.hours?.toString()}
                         onChangeText={(val) => handleChange("hours", val)}
                       />
@@ -421,14 +443,16 @@ export default function NewReportScreen() {
                         <MaterialIcons name="volunteer-activism" size={28} color="#2563eb" />
                       </View>
                       <View>
-                        <Text className="text-base font-semibold text-slate-900 block">Participó en el ministerio</Text>
-                        <Text className="text-xs text-gray-500">¿Predicó durante este mes?</Text>
+                        <Text className="text-base font-semibold text-text-main-light dark:text-text-main-dark block">
+                          Participó en el ministerio
+                        </Text>
+                        <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark">¿Predicó durante este mes?</Text>
                       </View>
                     </View>
                     <Switch
-                      trackColor={{ false: "#e2e8f0", true: "#2563eb" }}
-                      thumbColor={Platform.OS === "ios" ? "#ffffff" : "#ffffff"}
-                      ios_backgroundColor="#e2e8f0"
+                      trackColor={{ false: colorScheme === "dark" ? "#334155" : "#e2e8f0", true: "#2563eb" }}
+                      thumbColor="#ffffff"
+                      ios_backgroundColor={colorScheme === "dark" ? "#334155" : "#e2e8f0"}
                       onValueChange={(val) => handleChange("participated", val)}
                       value={formData.participated}
                     />
@@ -442,15 +466,16 @@ export default function NewReportScreen() {
                       <MaterialIcons name="menu-book" size={28} color="#2563eb" />
                     </View>
                     <View>
-                      <Text className="text-base font-semibold text-slate-900 block">Cursos bíblicos</Text>
-                      <Text className="text-xs text-gray-500">Número de cursos de la Biblia</Text>
+                      <Text className="text-base font-semibold text-text-main-light dark:text-text-main-dark block">Cursos bíblicos</Text>
+                      <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark">Número de cursos de la Biblia</Text>
                     </View>
                   </View>
-                  <View className="bg-gray-100 rounded-lg px-2 w-20">
+                  <View className="bg-surface-input-light dark:bg-surface-input-dark rounded-lg px-2 w-20">
                     <TextInput
-                      className="text-right font-bold text-lg text-slate-900 p-2"
+                      className="text-right font-bold text-lg text-text-main-light dark:text-text-main-dark p-2"
                       keyboardType="numeric"
                       placeholder="0"
+                      placeholderTextColor="#9ca3af80"
                       value={formData.bibleStudies}
                       onChangeText={(val) => handleChange("bibleStudies", val)}
                     />
@@ -461,10 +486,12 @@ export default function NewReportScreen() {
 
             {/* Observaciones */}
             <View className="flex-col gap-2">
-              <Text className="text-xs font-medium text-gray-500 uppercase tracking-wider ml-1">Observaciones (Opcional)</Text>
-              <View className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden p-2">
+              <Text className="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider ml-1">
+                Observaciones (Opcional)
+              </Text>
+              <View className="bg-card-light dark:bg-card-dark rounded-xl border border-border-input-light dark:border-border-input-dark shadow-sm overflow-hidden p-2">
                 <TextInput
-                  className="w-full h-24 text-base text-slate-900 p-2"
+                  className="w-full h-24 text-base text-text-main-light dark:text-text-main-dark p-2"
                   multiline
                   placeholder="Participación en construcción, número de horas aprobadas del salón de asamblea, estuvo enfermo, etc..."
                   placeholderTextColor="#9ca3af"
@@ -479,7 +506,9 @@ export default function NewReportScreen() {
             {/* Historial */}
             <View className="pt-2">
               <View className="flex-row items-center justify-between mb-3 px-1">
-                <Text className="text-xs font-medium text-gray-500 uppercase tracking-wider">Historial de Meses Anteriores</Text>
+                <Text className="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">
+                  Historial de Meses Anteriores
+                </Text>
                 <TouchableOpacity onPress={() => router.push(`/people/${id}/reports/record`)}>
                   <Text className="text-xs font-semibold text-primary">Ver Todo</Text>
                 </TouchableOpacity>
@@ -492,7 +521,7 @@ export default function NewReportScreen() {
                   {reports.map((report) => (
                     <View
                       key={report.id}
-                      className="flex-row items-center justify-between p-3 bg-white rounded-xl border border-gray-200 opacity-70"
+                      className="flex-row items-center justify-between p-3 bg-card-light dark:bg-card-dark rounded-xl border border-border-input-light dark:border-border-input-dark opacity-70"
                     >
                       <View className="flex-row items-center gap-3">
                         <View
@@ -505,28 +534,34 @@ export default function NewReportScreen() {
                           />
                         </View>
                         <View>
-                          <Text className="text-sm font-semibold text-slate-900">{formatDateReport(report.month, report.year!)}</Text>
-                          <Text className="text-xs text-gray-500">Enviado el {formatDateCreatedAt(report.createdAt!)}</Text>
+                          <Text className="text-sm font-semibold text-text-main-light dark:text-text-main-dark">
+                            {formatDateReport(report.month, report.year!)}
+                          </Text>
+                          <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+                            Enviado el {formatDateCreatedAt(report.createdAt!)}
+                          </Text>
                         </View>
                       </View>
                       <View className="items-end">
                         {report.participated ? (
-                          <Text className="text-sm font-bold text-slate-900">
+                          <Text className="text-sm font-bold text-text-main-light dark:text-text-main-dark">
                             {currentPublisher?.is_regular_pioneer || report.is_auxiliary_pioneer ? `${report.hours}h` : "Participó"}
                           </Text>
                         ) : (
                           <Text className="text-sm font-bold text-orange-500">No participó</Text>
                         )}
                         {(currentPublisher?.is_regular_pioneer || report.is_auxiliary_pioneer) && (
-                          <Text className="text-[10px] text-gray-500 font-medium uppercase">Participó</Text>
+                          <Text className="text-[10px] text-text-secondary-light dark:text-text-secondary-dark font-medium uppercase">
+                            Participó
+                          </Text>
                         )}
                       </View>
                     </View>
                   ))}
                 </View>
               ) : (
-                <View className="flex-row items-center justify-center p-3 bg-white rounded-xl border border-gray-100">
-                  <Text className="text-sm font-semibold text-slate-900">No hay informes anteriores</Text>
+                <View className="flex-row items-center justify-center p-3 bg-card-light dark:bg-card-dark rounded-xl border border-border-input-light dark:border-border-input-dark">
+                  <Text className="text-sm font-semibold text-text-main-light dark:text-text-main-dark">No hay informes anteriores</Text>
                 </View>
               )}
             </View>
@@ -536,7 +571,7 @@ export default function NewReportScreen() {
 
       {/* Floating Button */}
       <View
-        className="absolute bottom-0 left-0 w-full p-4 bg-white/80 border-t border-gray-200"
+        className="absolute bottom-0 left-0 w-full p-4 bg-background-light/80 dark:bg-background-dark/80 border-t border-border-input-light dark:border-border-input-dark"
         style={{ paddingBottom: Math.max(insets.bottom, 16) }}
       >
         <TouchableOpacity

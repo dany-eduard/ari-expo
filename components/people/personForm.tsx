@@ -124,17 +124,21 @@ export default function PersonForm({
   };
 
   return (
-    <KeyboardAvoidingView behavior="padding" className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+    <KeyboardAvoidingView
+      behavior="padding"
+      className="flex-1 bg-background-light dark:bg-background-dark"
+      style={{ paddingTop: insets.top }}
+    >
       {/* Header */}
-      <View className="w-full border-b border-slate-100">
+      <View className="w-full border-b border-border-input-light dark:border-border-input-dark">
         <View className="max-w-7xl mx-auto w-full px-4 py-3 flex-row items-center justify-between">
           <TouchableOpacity
             onPress={() => router.back()}
-            className="h-10 w-10 items-center justify-center rounded-full active:bg-slate-100"
+            className="h-10 w-10 items-center justify-center rounded-full active:bg-slate-100 dark:active:bg-slate-800"
           >
-            <MaterialIcons name="close" size={24} color="#0f172a" />
+            <MaterialIcons name="close" size={24} color="#0f172a" className="dark:text-slate-200" />
           </TouchableOpacity>
-          <Text className="text-base font-bold text-slate-900 tracking-wide">
+          <Text className="text-base font-bold text-text-main-light dark:text-text-main-dark tracking-wide">
             {initialData?.id ? (isViewing ? "Detalles" : "Editar Persona") : "Crear Nueva Persona"}
           </Text>
           <View className="w-10" />
@@ -157,7 +161,7 @@ export default function PersonForm({
           </View> */}
           <View className="p-6 items-center my-3">
             <View
-              className={`h-32 w-32 rounded-full border-4 border-slate-100 items-center justify-center overflow-hidden shadow-sm ${formData.sex === "MALE" ? "bg-blue-400" : formData.sex === "FEMALE" ? "bg-pink-400" : "bg-slate-400"}`}
+              className={`h-32 w-32 rounded-full border-4 border-slate-100 dark:border-slate-800 items-center justify-center overflow-hidden shadow-sm ${formData.sex === "MALE" ? "bg-blue-400" : formData.sex === "FEMALE" ? "bg-pink-400" : "bg-slate-400"}`}
             >
               <Text className="text-white text-5xl font-bold tracking-tighter">
                 {formData.first_name || formData.last_name
@@ -204,7 +208,7 @@ export default function PersonForm({
               />
             </View>
 
-            <View className="h-[1px] w-full bg-slate-100 my-2" />
+            <View className="h-[1px] w-full bg-border-input-light dark:bg-border-input-dark my-2" />
 
             {/* Important Dates */}
             <View className="gap-4">
@@ -227,7 +231,7 @@ export default function PersonForm({
               />
             </View>
 
-            <View className="h-[1px] w-full bg-slate-100 my-2" />
+            <View className="h-[1px] w-full bg-border-input-light dark:bg-border-input-dark my-2" />
 
             {/* Privileges & Status */}
             <View className="gap-4">
@@ -284,7 +288,7 @@ export default function PersonForm({
               </View>
             </View>
 
-            <View className="h-[1px] w-full bg-slate-100 my-2" />
+            <View className="h-[1px] w-full bg-border-input-light dark:bg-border-input-dark my-2" />
 
             {/* Assignment */}
             <View className="gap-4">
@@ -311,7 +315,7 @@ export default function PersonForm({
       {/* Footer */}
       {!isViewing && (
         <View
-          className="absolute bottom-0 left-0 right-0 p-4 bg-white/95 border-t border-slate-100"
+          className="absolute bottom-0 left-0 right-0 p-4 bg-background-light/95 dark:bg-background-dark/95 border-t border-border-input-light dark:border-border-input-dark"
           style={{ paddingBottom: Math.max(insets.bottom, 16) }}
         >
           <TouchableOpacity

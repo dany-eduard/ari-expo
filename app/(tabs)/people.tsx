@@ -84,24 +84,31 @@ export default function PeopleScreen() {
   );
 
   return (
-    <View className="flex-1 bg-background-page" style={{ paddingTop: insets.top + 14 }}>
+    <View className="flex-1 bg-background-light dark:bg-background-dark" style={{ paddingTop: insets.top + 14 }}>
       {/* Sticky Responsive Header */}
-      <View className="z-50 bg-white/90 border-b border-slate-200" style={Platform.OS === "web" ? { position: "sticky", top: 0 } : {}}>
+      <View
+        className="z-50 bg-background-light/90 dark:bg-card-dark/90 border-b border-border-input-light dark:border-border-input-dark"
+        style={Platform.OS === "web" ? { position: "sticky", top: 0 } : {}}
+      >
         <View className="gap-3 max-w-7xl mx-auto w-full px-4 md:px-6">
           <View className="flex-row items-center md:pt-6 pb-2 justify-between">
             <View>
               <View className="flex-row items-center gap-2">
-                <Text className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">Personas</Text>
+                <Text className="text-2xl md:text-3xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark">
+                  Personas
+                </Text>
                 <View className="bg-primary/10 px-3 py-1 rounded-full">
                   <Text className="text-sm font-semibold text-primary">{filteredPeople.length}</Text>
                 </View>
               </View>
-              <Text className="text-sm text-slate-500 font-medium">Congregación {user?.congregation || ""}</Text>
+              <Text className="text-sm text-text-secondary-light dark:text-text-secondary-dark font-medium">
+                Congregación {user?.congregation || ""}
+              </Text>
             </View>
 
             <View className="flex-row items-center gap-3">
-              <TouchableOpacity className="w-11 h-11 items-center justify-center rounded-full hover:bg-slate-100">
-                <MaterialIcons name="notifications-none" size={24} color="#64748b" />
+              <TouchableOpacity className="w-11 h-11 items-center justify-center rounded-full active:bg-slate-100 dark:active:bg-slate-800">
+                <MaterialIcons name="notifications-none" size={24} color="#64748b" className="dark:text-slate-400" />
               </TouchableOpacity>
 
               {/* Desktop Add Button */}
@@ -132,10 +139,10 @@ export default function PeopleScreen() {
               <TextInput
                 value={searchTerm}
                 onChangeText={setSearchTerm}
-                className="flex-1 h-12 pl-10 pr-10 text-base rounded-2xl bg-white border border-slate-200 text-slate-900"
+                className="flex-1 h-12 pl-10 pr-10 text-base rounded-2xl bg-surface-input-light dark:bg-surface-input-dark border border-border-input-light dark:border-border-input-dark text-text-main-light dark:text-text-main-dark"
                 placeholder="Buscar por nombre..."
-                placeholderTextColor="#94a3b8"
-                cursorColor="#252525ff"
+                placeholderTextColor="#94a3b880"
+                cursorColor="#2563eb"
                 selectionColor="#2563eb"
                 textAlignVertical="center"
               />

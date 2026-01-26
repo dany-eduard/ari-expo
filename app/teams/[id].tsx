@@ -8,12 +8,13 @@ import { Team } from "@/types/team.types";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
-import { FlatList, Modal, Text, TouchableOpacity, View, useWindowDimensions } from "react-native";
+import { FlatList, Modal, Text, TouchableOpacity, View, useColorScheme, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TeamDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const colorScheme = useColorScheme();
   const [team, setTeam] = useState<Team | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { width } = useWindowDimensions();
@@ -71,7 +72,7 @@ export default function TeamDetailsScreen() {
             top: (insets?.top || 0) + 50,
             right: 16,
             width: 200,
-            backgroundColor: "white",
+            backgroundColor: colorScheme === "dark" ? "#1e293b" : "white",
             borderRadius: 12,
             padding: 4,
             shadowColor: "#000",
@@ -80,7 +81,7 @@ export default function TeamDetailsScreen() {
             shadowRadius: 12,
             elevation: 5,
             borderWidth: 1,
-            borderColor: "#f1f5f9",
+            borderColor: colorScheme === "dark" ? "#334155" : "#f1f5f9",
           }}
         >
           <TouchableOpacity
@@ -88,10 +89,10 @@ export default function TeamDetailsScreen() {
               setMenuVisible(false);
               router.push(`/teams/edit/${id}`);
             }}
-            className="p-3 border-b border-gray-50 flex-row items-center gap-3 active:bg-slate-50 rounded-t-lg"
+            className="p-3 border-b border-border-input-light dark:border-border-input-dark flex-row items-center gap-3 active:bg-slate-50 dark:active:bg-slate-800 rounded-t-lg"
           >
-            <MaterialIcons name="edit" size={20} color="#64748b" />
-            <Text className="text-slate-700 font-medium text-sm">Editar grupo</Text>
+            <MaterialIcons name="edit" size={20} color="#64748b" className="dark:text-slate-400" />
+            <Text className="text-text-main-light dark:text-text-main-dark font-medium text-sm">Editar grupo</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -99,7 +100,7 @@ export default function TeamDetailsScreen() {
               setMenuVisible(false);
               handleDeleteGroup();
             }}
-            className="p-3 flex-row items-center gap-3 active:bg-slate-50 rounded-b-lg"
+            className="p-3 flex-row items-center gap-3 active:bg-slate-50 dark:active:bg-slate-800 rounded-b-lg"
           >
             <MaterialIcons name="delete" size={20} color="#e11d48" />
             <Text className="text-rose-600 font-medium text-sm">Eliminar grupo</Text>
@@ -124,45 +125,49 @@ export default function TeamDetailsScreen() {
     );
 
   const renderHeader = () => (
-    <View className="p-6 bg-white">
+    <View className="p-6 bg-background-light dark:bg-background-dark">
       {/* Header Section */}
       <View className="flex-row items-center gap-4 mb-8">
         <View className="w-16 h-16 rounded-full bg-primary/10 items-center justify-center">
           <MaterialIcons name="group" size={32} color="#2563eb" />
         </View>
         <View className="flex-1">
-          <Text className="text-2xl font-bold text-slate-900">{team.name}</Text>
-          <Text className="text-slate-500 font-medium">Congregación {team?.congregation?.name}</Text>
+          <Text className="text-2xl font-bold text-text-main-light dark:text-text-main-dark">{team.name}</Text>
+          <Text className="text-text-secondary-light dark:text-text-secondary-dark font-medium">
+            Congregación {team?.congregation?.name}
+          </Text>
         </View>
       </View>
 
       {/* Info Grid */}
       <View className="flex-row gap-4 mb-8">
-        <View className="flex-1 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-          <Text className="text-slate-500 text-sm font-semibold mb-1">Miembros</Text>
-          <Text className="text-2xl font-bold text-slate-900">{team.total_people || 0}</Text>
+        <View className="flex-1 p-4 bg-card-light dark:bg-card-dark rounded-2xl border border-border-input-light dark:border-border-input-dark">
+          <Text className="text-text-secondary-light dark:text-text-secondary-dark text-sm font-semibold mb-1">Miembros</Text>
+          <Text className="text-2xl font-bold text-text-main-light dark:text-text-main-dark">{team.total_people || 0}</Text>
         </View>
-        <View className="flex-1 p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
-          <Text className="text-emerald-600 text-sm font-semibold mb-1">Activos</Text>
-          <Text className="text-2xl font-bold text-emerald-700">{team.total_active_people || 0}</Text>
+        <View className="flex-1 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-100 dark:border-emerald-900/30">
+          <Text className="text-emerald-600 dark:text-emerald-400 text-sm font-semibold mb-1">Activos</Text>
+          <Text className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">{team.total_active_people || 0}</Text>
         </View>
       </View>
 
       {/* People List */}
       {team.people.length > 0 && (
-        <Text className="text-slate-900 text-lg font-bold leading-tight tracking-tight mt-4 mb-2">Miembros del grupo</Text>
+        <Text className="text-text-main-light dark:text-text-main-dark text-lg font-bold leading-tight tracking-tight mt-4 mb-2">
+          Miembros del grupo
+        </Text>
       )}
     </View>
   );
 
   return (
-    <View className="flex-1 bg-white">
+    <View className="flex-1 bg-background-light dark:bg-background-dark">
       <Stack.Screen
         options={{
           title: team.name,
           headerRight: () => (
             <TouchableOpacity onPress={() => setMenuVisible(true)} className="p-2 mr-2">
-              <MaterialIcons name="more-vert" size={24} color="#1e293b" />
+              <MaterialIcons name="more-vert" size={24} color={colorScheme === "dark" ? "#cbd5e1" : "#1e293b"} />
             </TouchableOpacity>
           ),
         }}

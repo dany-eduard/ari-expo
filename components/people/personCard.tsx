@@ -59,36 +59,46 @@ const MenuOptions = ({
             borderWidth: 1,
             borderColor: "#f1f5f9",
           }}
+          className="dark:bg-card-dark dark:border-border-input-dark"
         >
           {itsOnPeopleScreen && (
             <Link href={`/people/${person.id}/reports/record`} asChild>
-              <TouchableOpacity className="p-3 flex-row items-center gap-3 active:bg-slate-50 rounded-b-lg" onPress={onClose}>
-                <MaterialIcons name="history" size={20} color="#64748b" />
-                <Text className="text-slate-700 font-medium text-sm">Ver registro</Text>
+              <TouchableOpacity
+                className="p-3 flex-row items-center gap-3 active:bg-slate-50 dark:active:bg-slate-800 rounded-b-lg"
+                onPress={onClose}
+              >
+                <MaterialIcons name="history" size={20} color="#64748b" className="dark:text-slate-400" />
+                <Text className="text-slate-700 dark:text-slate-200 font-medium text-sm">Ver registro</Text>
               </TouchableOpacity>
             </Link>
           )}
           {itsOnTeamsScreen && (
             <Link href={`/people/${person.id}/reports/new`} asChild>
-              <TouchableOpacity className="p-3 flex-row items-center gap-3 active:bg-slate-50 rounded-b-lg" onPress={onClose}>
-                <MaterialIcons name="post-add" size={20} color="#64748b" />
-                <Text className="text-slate-700 font-medium text-sm">Agregar registro</Text>
+              <TouchableOpacity
+                className="p-3 flex-row items-center gap-3 active:bg-slate-50 dark:active:bg-slate-800 rounded-b-lg"
+                onPress={onClose}
+              >
+                <MaterialIcons name="post-add" size={20} color="#64748b" className="dark:text-slate-400" />
+                <Text className="text-slate-700 dark:text-slate-200 font-medium text-sm">Agregar registro</Text>
               </TouchableOpacity>
             </Link>
           )}
           <Link href={`/people/${person.id}?view=true`} asChild>
             <TouchableOpacity
-              className="p-3 border-b border-gray-50 flex-row items-center gap-3 active:bg-slate-50 rounded-t-lg"
+              className="p-3 border-b border-gray-50 dark:border-slate-800 flex-row items-center gap-3 active:bg-slate-50 dark:active:bg-slate-800 rounded-t-lg"
               onPress={onClose}
             >
-              <MaterialIcons name="visibility" size={20} color="#64748b" />
-              <Text className="text-slate-700 font-medium text-sm">Ver detalles</Text>
+              <MaterialIcons name="visibility" size={20} color="#64748b" className="dark:text-slate-400" />
+              <Text className="text-slate-700 dark:text-slate-200 font-medium text-sm">Ver detalles</Text>
             </TouchableOpacity>
           </Link>
           <Link href={`/people/${person.id}?edit=true`} asChild>
-            <TouchableOpacity className="p-3 flex-row items-center gap-3 active:bg-slate-50 rounded-b-lg" onPress={onClose}>
-              <MaterialIcons name="edit" size={20} color="#64748b" />
-              <Text className="text-slate-700 font-medium text-sm">Editar</Text>
+            <TouchableOpacity
+              className="p-3 flex-row items-center gap-3 active:bg-slate-50 dark:active:bg-slate-800 rounded-b-lg"
+              onPress={onClose}
+            >
+              <MaterialIcons name="edit" size={20} color="#64748b" className="dark:text-slate-400" />
+              <Text className="text-slate-700 dark:text-slate-200 font-medium text-sm">Editar</Text>
             </TouchableOpacity>
           </Link>
         </View>
@@ -118,7 +128,7 @@ const PersonCard: React.FC<PersonCardProps> = ({ person, onPress }) => {
       <TouchableOpacity
         activeOpacity={0.7}
         onPress={onPress}
-        className="flex flex-row items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200"
+        className="flex flex-row items-center gap-4 bg-card-light dark:bg-card-dark p-4 rounded-2xl border border-border-input-light dark:border-border-input-dark"
         style={{
           boxShadow: "0px 2px 10px rgba(15, 23, 42, 0.05)",
           elevation: 2,
@@ -126,7 +136,7 @@ const PersonCard: React.FC<PersonCardProps> = ({ person, onPress }) => {
       >
         <View className="relative">
           <View
-            className={`flex items-center justify-center h-14 w-14 rounded-full border-2 border-white ${person.sex === "MALE" ? "bg-blue-400" : "bg-pink-400"}`}
+            className={`flex items-center justify-center h-14 w-14 rounded-full border-2 border-white dark:border-slate-700 ${person.sex === "MALE" ? "bg-blue-400" : "bg-pink-400"}`}
           >
             <Text className="text-white font-bold text-lg">
               {person.first_name?.charAt(0).toUpperCase() + person.last_name?.charAt(0).toUpperCase()}
@@ -134,13 +144,13 @@ const PersonCard: React.FC<PersonCardProps> = ({ person, onPress }) => {
           </View>
 
           {!person.already_sent_last_report && (
-            <View className="absolute bottom-0 right-0 h-4 w-4 rounded-full bg-red-400 border-[3px] border-white" />
+            <View className="absolute bottom-0 right-0 h-4 w-4 rounded-full bg-red-400 border-[3px] border-white dark:border-slate-700" />
           )}
         </View>
 
         <View className="flex-1 flex-col justify-center">
           <View className="flex flex-row justify-between items-center mb-1">
-            <Text className="text-text-main text-base font-bold flex-1 mr-2" numberOfLines={1}>
+            <Text className="text-text-main-light dark:text-text-main-dark text-base font-bold flex-1 mr-2" numberOfLines={1}>
               {person.first_name.trim() + " " + person.last_name.trim()}
             </Text>
             {/* <View
@@ -177,7 +187,7 @@ const PersonCard: React.FC<PersonCardProps> = ({ person, onPress }) => {
         <View ref={buttonRef}>
           <TouchableOpacity
             onPress={handleOpenMenu}
-            className="w-9 h-9 items-center justify-center rounded-full bg-slate-50 active:bg-slate-100"
+            className="w-9 h-9 items-center justify-center rounded-full bg-surface-input-light dark:bg-surface-input-dark active:bg-slate-100 dark:active:bg-slate-700"
             activeOpacity={0.6}
           >
             <MaterialIcons name="more-vert" size={22} color="#94a3b8" />

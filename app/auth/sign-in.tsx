@@ -127,7 +127,11 @@ const SignInScreen: React.FC = () => {
 
   return (
     <KeyboardAvoidingView behavior="padding" className="flex-1">
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="bg-background-page" keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        className="bg-background-light dark:bg-background-dark"
+        keyboardShouldPersistTaps="handled"
+      >
         <View className="relative flex flex-1 w-full flex-col overflow-hidden items-center justify-center p-4">
           {/* Background Decoration */}
           <View className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none" />
@@ -139,8 +143,10 @@ const SignInScreen: React.FC = () => {
                 <MaterialIcons name="token" size={28} color="#2563eb" />
               </View>
               <Text className="text-primary text-sm font-bold tracking-wide uppercase">Informe de Servicio</Text>
-              <Text className="text-text-main text-3xl font-bold tracking-tight text-center">Bienvenido</Text>
-              <Text className="text-text-secondary text-base font-normal text-center max-w-xs">
+              <Text className="text-text-main-light dark:text-text-main-dark text-3xl font-bold tracking-tight text-center">
+                Bienvenido
+              </Text>
+              <Text className="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal text-center max-w-xs">
                 Inicia sesión para registrar la actividad mensual
               </Text>
             </View>
@@ -155,7 +161,7 @@ const SignInScreen: React.FC = () => {
                 activeOpacity={0.7}
                 className="flex flex-row items-center justify-center gap-1"
               >
-                <Text className="text-text-secondary text-sm">¿No tienes una cuenta?</Text>
+                <Text className="text-text-secondary-light dark:text-text-secondary-dark text-sm">¿No tienes una cuenta?</Text>
                 <Text className="text-primary text-sm decoration-2 underline-offset-4">Regístrate aquí</Text>
               </TouchableOpacity>
             </View> */}

@@ -1,4 +1,5 @@
 import InputField from "@/components/ui/inputField";
+import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Team } from "@/types/team.types";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { useRouter } from "expo-router";
@@ -18,6 +19,7 @@ export default function TeamForm({ initialData, onSubmit, isLoading, submitLabel
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
 
   const handleSubmit = async () => {
     if (!name.trim()) {
@@ -33,17 +35,23 @@ export default function TeamForm({ initialData, onSubmit, isLoading, submitLabel
   };
 
   return (
-    <KeyboardAvoidingView behavior="padding" className="flex-1 bg-white" style={{ paddingTop: insets.top }}>
+    <KeyboardAvoidingView
+      behavior="padding"
+      className="flex-1 bg-background-light dark:bg-background-dark"
+      style={{ paddingTop: insets.top }}
+    >
       {/* Header Container aligned with standard max-width */}
-      <View className="w-full border-b border-slate-100">
+      <View className="w-full border-b border-border-input-light dark:border-border-input-dark">
         <View className="max-w-7xl mx-auto w-full px-4 py-3 flex-row items-center justify-between">
           <TouchableOpacity
             onPress={() => router.back()}
-            className="h-10 w-10 items-center justify-center rounded-full active:bg-slate-100"
+            className="h-10 w-10 items-center justify-center rounded-full active:bg-slate-100 dark:active:bg-slate-800"
           >
-            <MaterialIcons name="close" size={24} color="#0f172a" />
+            <MaterialIcons name="close" size={24} color="#0f172a" className="dark:text-slate-200" />
           </TouchableOpacity>
-          <Text className="text-base font-bold text-slate-900 tracking-wide">{initialData?.id ? "Editar Grupo" : "Nuevo Grupo"}</Text>
+          <Text className="text-base font-bold text-text-main-light dark:text-text-main-dark tracking-wide">
+            {initialData?.id ? "Editar Grupo" : "Nuevo Grupo"}
+          </Text>
           <View className="w-10" />
         </View>
       </View>
@@ -67,10 +75,10 @@ export default function TeamForm({ initialData, onSubmit, isLoading, submitLabel
 
           {/* Title & Description */}
           <View className="mb-8 items-center md:items-start">
-            <Text className="text-slate-900 text-[28px] font-bold leading-tight tracking-tight mb-3 text-center md:text-left">
+            <Text className="text-text-main-light dark:text-text-main-dark text-[28px] font-bold leading-tight tracking-tight mb-3 text-center md:text-left">
               Dale un nombre al {initialData?.id ? "grupo" : "nuevo grupo"}
             </Text>
-            <Text className="text-slate-500 text-base font-normal leading-relaxed text-center md:text-left">
+            <Text className="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal leading-relaxed text-center md:text-left">
               {initialData?.id ? "Este es" : "Crea"} un espacio para agrupar y organizar la información de las personas de la congregación.
             </Text>
           </View>
@@ -89,7 +97,9 @@ export default function TeamForm({ initialData, onSubmit, isLoading, submitLabel
                 icon="edit"
                 iconPosition="left"
               />
-              <Text className="text-xs text-slate-500 ml-1 mt-1">Este nombre será visible para todos los miembros.</Text>
+              <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark ml-1 mt-1">
+                Este nombre será visible para todos los miembros.
+              </Text>
               {error && <Text className="text-rose-500 text-xs ml-1 mt-1">{error}</Text>}
             </View>
           </View>
@@ -98,7 +108,7 @@ export default function TeamForm({ initialData, onSubmit, isLoading, submitLabel
 
       {/* Fixed Footer with Submit Button */}
       <View
-        className="absolute bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-6"
+        className="absolute bottom-0 left-0 right-0 bg-background-light/95 dark:bg-card-dark/95 border-t border-border-input-light dark:border-border-input-dark p-6"
         style={{ paddingBottom: Math.max(insets.bottom, 24) }}
       >
         <View className="max-w-7xl mx-auto w-full">
@@ -106,7 +116,7 @@ export default function TeamForm({ initialData, onSubmit, isLoading, submitLabel
             onPress={handleSubmit}
             disabled={isLoading}
             activeOpacity={0.8}
-            className={`relative w-full rounded-xl p-4 shadow-lg flex-row items-center justify-center gap-2 ${isLoading ? "bg-slate-300" : "bg-primary"}`}
+            className={`relative w-full rounded-xl p-4 shadow-lg flex-row items-center justify-center gap-2 ${isLoading ? "bg-slate-300 dark:bg-slate-700" : "bg-primary"}`}
             style={!isLoading ? { shadowColor: "#2563eb", shadowOpacity: 0.2, shadowRadius: 10, elevation: 4 } : {}}
           >
             {isLoading ? (

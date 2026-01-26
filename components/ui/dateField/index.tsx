@@ -110,17 +110,21 @@ const DateField: React.FC<DateFieldProps> = ({ label, value, onChange, placehold
 
   return (
     <View className="flex flex-col gap-2">
-      <Text className="text-text-main text-sm font-medium ml-1">{label}</Text>
+      <Text className="text-text-main-light dark:text-text-main-dark text-sm font-medium ml-1">{label}</Text>
 
       <TouchableOpacity
         onPress={() => setModalVisible(true)}
         activeOpacity={0.7}
         disabled={disabled}
-        className="w-full rounded-xl border border-border-input bg-surface-input h-14 pl-4 pr-12 flex-row items-center relative"
+        className="w-full rounded-xl border border-border-input-light dark:border-border-input-dark bg-surface-input-light dark:bg-surface-input-dark h-14 pl-4 pr-12 flex-row items-center relative"
       >
-        <Text className={`text-base ${value ? "text-text-main" : "text-text-secondary/50"}`}>{displayDate}</Text>
+        <Text
+          className={`text-base ${value ? "text-text-main-light dark:text-text-main-dark" : "text-text-secondary-light/50 dark:text-text-secondary-dark/50"}`}
+        >
+          {displayDate}
+        </Text>
         <View className="absolute right-4 top-0 h-full justify-center">
-          <MaterialIcons name={(icon as any) || "calendar-today"} size={20} color="#9BA1A6" />
+          <MaterialIcons name={(icon as any) || "calendar-today"} size={20} color="#9BA1A6" className="dark:text-slate-400" />
         </View>
       </TouchableOpacity>
 
@@ -130,20 +134,19 @@ const DateField: React.FC<DateFieldProps> = ({ label, value, onChange, placehold
           <Animated.View
             style={{
               transform: [{ translateY: slideAnim }],
-              backgroundColor: "white",
             }}
-            className="w-full rounded-t-3xl overflow-hidden pb-8"
+            className="w-full rounded-t-3xl overflow-hidden pb-8 bg-background-light dark:bg-background-dark"
           >
-            <View className="p-5 border-b border-slate-100 flex-row items-center justify-between bg-white">
-              <Text className="text-slate-900 text-lg font-bold">{label}</Text>
+            <View className="p-5 border-b border-border-input-light dark:border-border-input-dark flex-row items-center justify-between bg-background-light dark:bg-background-dark">
+              <Text className="text-text-main-light dark:text-text-main-dark text-lg font-bold">{label}</Text>
               <TouchableOpacity onPress={handleClose} className="p-1">
-                <MaterialIcons name="close" size={24} color="#64748b" />
+                <MaterialIcons name="close" size={24} color="#64748b" className="dark:text-slate-400" />
               </TouchableOpacity>
             </View>
 
-            <View className="flex-row h-72 bg-white">
+            <View className="flex-row h-72 bg-background-light dark:bg-background-dark">
               {/* Day column */}
-              <View className="flex-1 border-r border-slate-50">
+              <View className="flex-1 border-r border-border-input-light dark:border-border-input-dark">
                 <Text className="text-center text-xs font-bold text-slate-400 py-2">Día</Text>
                 <ScrollView showsVerticalScrollIndicator={false}>
                   {days.map((d) => (
@@ -152,14 +155,18 @@ const DateField: React.FC<DateFieldProps> = ({ label, value, onChange, placehold
                       onPress={() => setTempDay(d)}
                       className={`py-3 items-center ${tempDay === d ? "bg-primary/10" : ""}`}
                     >
-                      <Text className={`text-lg ${tempDay === d ? "text-primary font-bold" : "text-slate-700"}`}>{d}</Text>
+                      <Text
+                        className={`text-lg ${tempDay === d ? "text-primary font-bold" : "text-text-main-light dark:text-text-main-dark"}`}
+                      >
+                        {d}
+                      </Text>
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
               </View>
 
               {/* Month column */}
-              <View className="flex-[2] border-r border-slate-50">
+              <View className="flex-[2] border-r border-border-input-light dark:border-border-input-dark">
                 <Text className="text-center text-xs font-bold text-slate-400 py-2">Mes</Text>
                 <ScrollView showsVerticalScrollIndicator={false}>
                   {months.map((m, index) => (
@@ -168,7 +175,11 @@ const DateField: React.FC<DateFieldProps> = ({ label, value, onChange, placehold
                       onPress={() => setTempMonth(index)}
                       className={`py-3 items-center ${tempMonth === index ? "bg-primary/10" : ""}`}
                     >
-                      <Text className={`text-lg ${tempMonth === index ? "text-primary font-bold" : "text-slate-700"}`}>{m}</Text>
+                      <Text
+                        className={`text-lg ${tempMonth === index ? "text-primary font-bold" : "text-text-main-light dark:text-text-main-dark"}`}
+                      >
+                        {m}
+                      </Text>
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
@@ -184,14 +195,18 @@ const DateField: React.FC<DateFieldProps> = ({ label, value, onChange, placehold
                       onPress={() => setTempYear(y)}
                       className={`py-3 items-center ${tempYear === y ? "bg-primary/10" : ""}`}
                     >
-                      <Text className={`text-lg ${tempYear === y ? "text-primary font-bold" : "text-slate-700"}`}>{y}</Text>
+                      <Text
+                        className={`text-lg ${tempYear === y ? "text-primary font-bold" : "text-text-main-light dark:text-text-main-dark"}`}
+                      >
+                        {y}
+                      </Text>
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
               </View>
             </View>
 
-            <View className="px-5 my-4 bg-white">
+            <View className="px-5 my-4 bg-background-light dark:bg-background-dark">
               <TouchableOpacity
                 onPress={handleConfirm}
                 className="items-center justify-center h-14 rounded-xl bg-primary shadow-sm"
