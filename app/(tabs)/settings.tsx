@@ -79,11 +79,7 @@ export default function SettingsScreen() {
       });
       setShowSyncModal(true);
     } catch (error) {
-      if (error instanceof Error && error.message === "Unauthorized") {
-        ShowAlert("Error", error.message);
-      } else {
-        ShowAlert("Error", "No se pudo sincronizar el estado de las personas.");
-      }
+      console.error("Error syncing people status:", error);
     } finally {
       setIsSyncing(false);
     }

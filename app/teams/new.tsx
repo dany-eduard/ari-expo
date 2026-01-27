@@ -22,7 +22,6 @@ export default function NewTeamScreen() {
       router.back();
     } catch (error) {
       console.error("Error creating team:", error);
-      ShowAlert("Error", "No se pudo crear el grupo");
     } finally {
       setIsLoading(false);
     }

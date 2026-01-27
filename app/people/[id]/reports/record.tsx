@@ -1,4 +1,3 @@
-import { ShowAlert } from "@/components/alert";
 import { Loading } from "@/components/ui/loading";
 import { NoData } from "@/components/ui/no-data";
 import { personService } from "@/services/person.service";
@@ -152,11 +151,7 @@ export default function ReportHistoryScreen() {
 
       setReports(orderedReports);
     } catch (error) {
-      if (error instanceof Error && error.message === "Unauthorized") {
-        ShowAlert("Error", error.message);
-      } else {
-        ShowAlert("Error", "No se pudo obtener el historial");
-      }
+      console.error("Error fetching reports:", error);
     } finally {
       setIsLoading(false);
     }

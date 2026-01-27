@@ -1,4 +1,3 @@
-import { ShowAlert } from "@/components/alert";
 import { useSession } from "@/components/ctx";
 import TeamCard from "@/components/teams/teamCard";
 import { Loading } from "@/components/ui/loading";
@@ -34,7 +33,6 @@ export default function TeamsScreen() {
       }
       setTeams(data);
     } catch (error) {
-      ShowAlert("Error", "No se pudo obtener la lista de equipos");
       console.error("Error fetching teams:", error);
     } finally {
       setIsLoading(false);

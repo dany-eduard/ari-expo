@@ -1,4 +1,3 @@
-import { ShowAlert } from "@/components/alert";
 import { useSession } from "@/components/ctx";
 import FilterBar from "@/components/people/filterBar";
 import PersonCard from "@/components/people/personCard";
@@ -31,11 +30,7 @@ export default function PeopleScreen() {
       people.sort((a: Person, b: Person) => a.last_name.localeCompare(b.last_name));
       setPeople(people);
     } catch (error) {
-      if (error instanceof Error && error.message === "Unauthorized") {
-        ShowAlert("Error", error.message);
-      } else {
-        ShowAlert("Error", "No se pudo obtener la lista de personas de la congregación");
-      }
+      console.error("Error fetching people:", error);
     } finally {
       setIsLoading(false);
     }

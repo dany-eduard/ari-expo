@@ -158,7 +158,7 @@ export default function NewReportScreen() {
   const [people, setPeople] = useState<Person[]>([]);
   const [isRegularPioneer, setIsRegularPioneer] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingReports, setIsLoadingReports] = useState(true);
+  const [isLoadingReports, setIsLoadingReports] = useState(false);
 
   const { month, year } = getInitialPeriod();
 
@@ -190,24 +190,19 @@ export default function NewReportScreen() {
       setPublishers(publishers);
       setPeople(people);
     } catch (error) {
-      if (error instanceof Error && error.message === "Unauthorized") {
-        ShowAlert("Error", error.message);
-      } else {
-        ShowAlert("Error", "No se pudo obtener la lista de personas de la congregación");
-      }
+      console.error("Error fetching people:", error);
     } finally {
       setIsLoading(false);
     }
   }, [user?.congregation_id]);
 
   const fetchPublisherReports = useCallback(async () => {
-    if (!user?.congregation_id || !id) return;
+    if (!user?.congregation_id || !id || Number(id) === 0) return;
     setIsLoadingReports(true);
     try {
       const reports = await publisherReportService.getPublisherReportsByPersonId({ person_id: id!, limit: 3, order: "desc" });
       setReports(reports);
     } catch (error) {
-      ShowAlert("Error", "No se pudo obtener la lista de reportes de la persona");
       console.error("Error fetching reports:", error);
     } finally {
       setIsLoadingReports(false);

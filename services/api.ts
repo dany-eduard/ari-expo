@@ -1,3 +1,4 @@
+import { ShowAlert } from "@/components/alert";
 import { API_URL } from "@/constants/config";
 import { setStorageItemAsync } from "@/hooks/useStorageState";
 import * as SecureStore from "expo-secure-store";
@@ -93,6 +94,18 @@ export const api = {
     });
 
     if (!response.ok) {
+      console.log("Error en la petición:", response);
+      if (response.status === 401) {
+        ShowAlert("No autorizado", "Parece que tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+        removeToken();
+        navigationState.setPath("/auth/sign-in");
+        return;
+      }
+
+      if (response.status === 403) {
+        ShowAlert("Acceso denegado", "No tienes permisos suficientes para realizar esta acción.");
+      }
+
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || `Request failed with status ${response.status}`);
     }
