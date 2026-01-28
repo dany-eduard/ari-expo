@@ -38,19 +38,25 @@ const SelectField: React.FC<SelectFieldProps> = ({ label, value, placeholder, on
     <View className="flex flex-col gap-2">
       <Text className="text-text-main-light dark:text-text-main-dark text-sm font-medium ml-1">{label}</Text>
 
-      <TouchableOpacity
-        onPress={() => setModalVisible(true)}
-        activeOpacity={0.7}
-        disabled={disabled}
-        className="w-full rounded-xl border border-border-input-light dark:border-border-input-dark bg-surface-input-light dark:bg-surface-input-dark h-14 pl-4 pr-4 flex-row items-center justify-between"
-      >
-        <Text
-          className={`text-base ${selectedOption ? "text-text-main-light dark:text-text-main-dark" : "text-text-secondary-light/50 dark:text-text-secondary-dark/50"}`}
+      <View className="relative w-full">
+        <TouchableOpacity
+          onPress={() => setModalVisible(true)}
+          activeOpacity={0.7}
+          disabled={disabled}
+          className="w-full rounded-xl border border-border-input-light dark:border-border-input-dark bg-surface-input-light dark:bg-surface-input-dark h-14 pl-4 pr-12 flex-row items-center shadow-sm overflow-hidden"
         >
-          {selectedOption ? selectedOption.label : placeholder || "Selecciona una opción"}
-        </Text>
-        <MaterialIcons name="expand-more" size={24} color="#9BA1A6" className="dark:text-slate-400" />
-      </TouchableOpacity>
+          <Text
+            numberOfLines={1}
+            className={`flex-1 text-base ${selectedOption ? "text-text-main-light dark:text-text-main-dark" : "text-text-secondary-light/50 dark:text-text-secondary-dark/50"}`}
+          >
+            {selectedOption ? selectedOption.label : placeholder || "Selecciona una opción"}
+          </Text>
+        </TouchableOpacity>
+
+        <View className="absolute right-4 top-0 h-full justify-center z-10 pointer-events-none">
+          <MaterialIcons name="expand-more" size={20} color="#9BA1A6" className="dark:text-slate-400" />
+        </View>
+      </View>
 
       <Modal animationType="fade" transparent={true} visible={modalVisible} onRequestClose={handleClose}>
         <View className="flex-1 bg-black/40">
@@ -59,7 +65,7 @@ const SelectField: React.FC<SelectFieldProps> = ({ label, value, placeholder, on
             style={{
               transform: [{ translateY: slideAnim }],
             }}
-            className="w-full rounded-t-3xl overflow-hidden pb-8 bg-background-light dark:bg-background-dark"
+            className="w-full rounded-t-3xl overflow-hidden bg-background-light dark:bg-background-dark"
           >
             <View className="p-5 border-b border-border-input-light dark:border-border-input-dark flex-row items-center justify-between bg-background-light dark:bg-background-dark">
               <Text className="text-text-main-light dark:text-text-main-dark text-lg font-bold">{label}</Text>
@@ -90,12 +96,13 @@ const SelectField: React.FC<SelectFieldProps> = ({ label, value, placeholder, on
               )}
             />
 
-            <View className="px-5 mb-4 bg-background-light dark:bg-background-dark">
+            <View className="p-6 bg-background-light dark:bg-background-dark">
               <TouchableOpacity
                 onPress={handleClose}
-                className="items-center justify-center h-14 rounded-xl bg-surface-input-light dark:bg-surface-input-dark"
+                activeOpacity={0.8}
+                className="w-full items-center justify-center h-14 rounded-xl bg-surface-input-light dark:bg-surface-input-dark border border-border-input-light dark:border-border-input-dark"
               >
-                <Text className="text-text-main-light dark:text-text-main-dark font-bold">Cancelar</Text>
+                <Text className="text-text-main-light dark:text-text-main-dark font-bold text-base">Cancelar</Text>
               </TouchableOpacity>
             </View>
           </Animated.View>
