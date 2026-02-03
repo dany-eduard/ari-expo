@@ -93,7 +93,7 @@ export const api = {
       headers,
     });
 
-    if (!response.ok) {
+    if (!response.ok && !normalizedEndpoint.includes("/auth/login")) {
       console.log("Error en la petición:", response);
       if (response.status === 401) {
         ShowAlert("No autorizado", "Parece que tu sesión ha expirado. Por favor, inicia sesión nuevamente.");

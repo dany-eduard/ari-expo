@@ -36,15 +36,16 @@ export function SessionProvider({ children }: PropsWithChildren) {
   const signIn = useCallback(
     async (data: LoginFormData) => {
       try {
-        const { access_token, user } = await authService.login(data);
-        setSession(access_token);
-        setUser(JSON.stringify(user));
+        const response = await authService.login(data);
+        if (!response.access_token) throw new Error(response.message || "No se pudo iniciar sesión");
+        setSession(response.access_token);
+        setUser(JSON.stringify(response.user));
       } catch (error) {
         console.error("Login failed:", error);
         throw error;
       }
     },
-    [setSession, setUser]
+    [setSession, setUser],
   );
 
   const signOut = useCallback(() => {
@@ -60,7 +61,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
       user: JSON.parse(user || "{}"),
       isLoading,
     }),
-    [signIn, signOut, session, user, isLoading]
+    [signIn, signOut, session, user, isLoading],
   );
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

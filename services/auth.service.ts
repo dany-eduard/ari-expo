@@ -13,7 +13,7 @@ export interface AuthResponse {
 }
 
 export const authService = {
-  async login(data: LoginFormData): Promise<AuthResponse> {
+  async login(data: LoginFormData): Promise<AuthResponse & { message?: string }> {
     return api.post("/auth/login", {
       email: data.email,
       password: data.password,
