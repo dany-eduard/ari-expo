@@ -148,10 +148,15 @@ const now = new Date();
 
 export default function NewReportScreen() {
   const { user } = useSession();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, reportId, mode } = useLocalSearchParams<{
+    id: string;
+    reportId?: string;
+    mode?: string;
+  }>();
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
 
+  const isEditMode = mode === "edit";
   const [modalType, setModalType] = useState<"publisher" | "month" | "year" | null>(null);
   const [publishers, setPublishers] = useState<{ label: string; value: string }[]>([]);
   const [reports, setReports] = useState<PublisherReport[]>([]);
@@ -159,6 +164,7 @@ export default function NewReportScreen() {
   const [isRegularPioneer, setIsRegularPioneer] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingReports, setIsLoadingReports] = useState(false);
+  const [existingReport, setExistingReport] = useState<PublisherReport | null>(null);
 
   const { month, year } = getInitialPeriod();
 
@@ -200,7 +206,11 @@ export default function NewReportScreen() {
     if (!user?.congregation_id || !id || Number(id) === 0) return;
     setIsLoadingReports(true);
     try {
-      const reports = await publisherReportService.getPublisherReportsByPersonId({ person_id: id!, limit: 3, order: "desc" });
+      const reports = await publisherReportService.getPublisherReportsByPersonId({
+        person_id: id!,
+        limit: 3,
+        order: "desc",
+      });
       setReports(reports);
     } catch (error) {
       console.error("Error fetching reports:", error);
@@ -232,9 +242,63 @@ export default function NewReportScreen() {
     }
   };
 
+  const handleUpdate = async () => {
+    if (!reportId) return;
+    try {
+      setIsLoading(true);
+      await publisherReportService.updatePublisherReport(+reportId, {
+        person_id: +formData.publisherId,
+        year: +formData.year,
+        month: +formData.month,
+        participated: formData.participated || Boolean(formData.hours),
+        hours: +formData.hours,
+        bible_courses: +formData.bibleStudies,
+        notes: formData.remarks,
+        is_auxiliary_pioneer: formData.isAuxiliaryPioneer,
+      });
+      ShowAlert("Éxito", "Cambios guardados correctamente");
+      router.back();
+    } catch (error: any) {
+      console.error("Error updating report:", error);
+      ShowAlert("Error", error?.message || "No se pudo actualizar el reporte");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadExistingReport = async () => {
+    if (!reportId || !isEditMode) return;
+    try {
+      setIsLoading(true);
+      const report = await publisherReportService.getPublisherReportById(reportId);
+      setExistingReport(report);
+      setFormData({
+        publisherId: report.person_id?.toString() || id!,
+        month: report.month?.toString().padStart(2, "0") || month.toString().padStart(2, "0"),
+        year: report.year?.toString() || year.toString(),
+        isAuxiliaryPioneer: report.is_auxiliary_pioneer || false,
+        participated: report.participated || false,
+        hours: report.hours?.toString() || "",
+        bibleStudies: report.bible_courses?.toString() || "",
+        remarks: report.notes || "",
+      });
+    } catch (error: any) {
+      console.error("Error loading report:", error);
+      ShowAlert("Error", error?.message || "No se pudo cargar el reporte");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchPeople();
   }, [fetchPeople]);
+
+  useEffect(() => {
+    if (isEditMode && reportId) {
+      loadExistingReport();
+    }
+  }, [isEditMode, reportId]);
 
   useEffect(() => {
     fetchPublisherReports();
@@ -296,7 +360,7 @@ export default function NewReportScreen() {
               className="text-[17px] font-semibold text-center text-text-main-light dark:text-text-main-dark w-full max-w-[200px]"
               numberOfLines={1}
             >
-              Informe Mensual
+              {isEditMode ? "Editar Informe" : "Informe Mensual"}
             </Text>
           </View>
           <View className="w-[70px]" />
@@ -315,9 +379,10 @@ export default function NewReportScreen() {
               <View className="flex-col bg-card-light dark:bg-card-dark rounded-xl overflow-hidden shadow-sm border border-border-input-light dark:border-border-input-dark divide-y divide-border-input-light dark:divide-border-input-dark">
                 {/* Publisher */}
                 <TouchableOpacity
-                  onPress={() => setModalType("publisher")}
-                  activeOpacity={0.7}
-                  className="relative flex-row items-center p-4 hover:bg-gray-50"
+                  onPress={() => !isEditMode && setModalType("publisher")}
+                  activeOpacity={isEditMode ? 1 : 0.7}
+                  className={`relative flex-row items-center p-4 ${isEditMode ? "opacity-60" : "hover:bg-gray-50"}`}
+                  disabled={isEditMode}
                 >
                   <MaterialIcons name="person" size={24} color="#9ca3af" style={{ marginRight: 12 }} />
                   <View className="flex-1">
@@ -332,15 +397,16 @@ export default function NewReportScreen() {
                       </Text>
                     )}
                   </View>
-                  <MaterialIcons name="expand-more" size={24} color="#9ca3af" />
+                  {!isEditMode && <MaterialIcons name="expand-more" size={24} color="#9ca3af" />}
                 </TouchableOpacity>
 
                 {/* Period Row */}
                 <View className="flex-row divide-x divide-gray-100">
                   <TouchableOpacity
-                    onPress={() => setModalType("month")}
-                    activeOpacity={0.7}
-                    className="relative flex-1 flex-row items-center p-4"
+                    onPress={() => !isEditMode && setModalType("month")}
+                    activeOpacity={isEditMode ? 1 : 0.7}
+                    className={`relative flex-1 flex-row items-center p-4 ${isEditMode ? "opacity-60" : ""}`}
+                    disabled={isEditMode}
                   >
                     <MaterialIcons name="calendar-today" size={24} color="#9ca3af" style={{ marginRight: 12 }} />
                     <View className="flex-1">
@@ -350,14 +416,16 @@ export default function NewReportScreen() {
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    onPress={() => setModalType("year")}
-                    activeOpacity={0.7}
-                    className="relative w-1/3 flex-row items-center p-4"
+                    onPress={() => !isEditMode && setModalType("year")}
+                    activeOpacity={isEditMode ? 1 : 0.7}
+                    className={`relative w-1/3 flex-row items-center p-4 ${isEditMode ? "opacity-60" : ""}`}
+                    disabled={isEditMode}
                   >
                     <View className="flex-1">
                       <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark block mb-0.5">Año</Text>
                       <Text className="text-base font-medium text-text-main-light dark:text-text-main-dark">{formData.year}</Text>
                     </View>
+                    {!isEditMode && <MaterialIcons name="expand-more" size={24} color="#9ca3af" />}
                   </TouchableOpacity>
                 </View>
 
@@ -445,7 +513,10 @@ export default function NewReportScreen() {
                       </View>
                     </View>
                     <Switch
-                      trackColor={{ false: colorScheme === "dark" ? "#334155" : "#e2e8f0", true: "#2563eb" }}
+                      trackColor={{
+                        false: colorScheme === "dark" ? "#334155" : "#e2e8f0",
+                        true: "#2563eb",
+                      }}
                       thumbColor="#ffffff"
                       ios_backgroundColor={colorScheme === "dark" ? "#334155" : "#e2e8f0"}
                       onValueChange={(val) => handleChange("participated", val)}
@@ -570,12 +641,12 @@ export default function NewReportScreen() {
         style={{ paddingBottom: Math.max(insets.bottom, 16) }}
       >
         <TouchableOpacity
-          onPress={() => handleCreate()}
+          onPress={() => (isEditMode ? handleUpdate() : handleCreate())}
           activeOpacity={0.8}
           className="w-full flex-row items-center justify-center gap-2 bg-primary h-14 rounded-xl shadow-lg shadow-blue-500/40"
         >
-          <MaterialIcons name="send" size={24} color="white" />
-          <Text className="text-white text-lg font-bold">Enviar Informe Mensual</Text>
+          <MaterialIcons name={isEditMode ? "save" : "send"} size={24} color="white" />
+          <Text className="text-white text-lg font-bold">{isEditMode ? "Guardar cambios" : "Enviar Informe Mensual"}</Text>
         </TouchableOpacity>
       </View>
     </View>

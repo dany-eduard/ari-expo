@@ -95,6 +95,21 @@ const getInitialPeriod = () => {
   return { month: currentMonth, year: currentYear };
 };
 
+const canEditReport = (report: any): boolean => {
+  const nowInner = new Date();
+  const dayInner = nowInner.getDate();
+  const monthInner = nowInner.getMonth() + 1;
+
+  return (
+    typeof report.id === "number" &&
+    report.id > 0 &&
+    report.id < Number.MAX_SAFE_INTEGER &&
+    dayInner >= 1 &&
+    dayInner <= 20 &&
+    report.month === (monthInner === 1 ? 12 : monthInner - 1)
+  );
+};
+
 export default function ReportHistoryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
@@ -110,7 +125,10 @@ export default function ReportHistoryScreen() {
     try {
       const [personData, reportsData] = await Promise.all([
         personService.getPersonById(id),
-        publisherReportService.getPublisherReportsByPersonId({ person_id: id, service_year: selectedYear }),
+        publisherReportService.getPublisherReportsByPersonId({
+          person_id: id,
+          service_year: selectedYear,
+        }),
       ]);
       setPerson(personData);
 
@@ -355,6 +373,14 @@ export default function ReportHistoryScreen() {
                       <Text className="font-semibold text-lg text-text-main-light dark:text-text-main-dark">
                         {monthNames[report.month - 1]}
                       </Text>
+                      {canEditReport(report) && (
+                        <TouchableOpacity
+                          onPress={() => router.push(`/people/${id}/reports/new?reportId=${report.id}&mode=edit`)}
+                          className="ml-1 p-1 rounded-full active:bg-gray-200 dark:active:bg-gray-700"
+                        >
+                          <MaterialIcons name="edit" size={18} color="#64748b" />
+                        </TouchableOpacity>
+                      )}
                     </View>
                     {(report.is_auxiliary_pioneer || person.is_regular_pioneer) && (
                       <View className="items-end">
