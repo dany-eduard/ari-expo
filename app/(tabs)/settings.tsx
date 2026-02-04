@@ -3,12 +3,20 @@ import { useSession } from "@/components/ctx";
 import SyncResultModal from "@/components/SyncResultModal";
 import { APP_VERSION } from "@/constants/config";
 import { personService } from "@/services/person.service";
-import { reportService } from "@/services/report.service";
+import { reportService, ZipProgress } from "@/services/report.service";
 import { currentYear, getInitialPeriod } from "@/utils/date.utils";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const styles = StyleSheet.create({
@@ -24,14 +32,32 @@ const styles = StyleSheet.create({
         elevation: 2,
       },
       web: {
-        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        boxShadow:
+          "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
       },
     }),
   },
 });
 
-const MaterialIcon = ({ name, size = 24, color, className }: { name: string; size?: number; color?: string; className?: string }) => {
-  return <MaterialIcons name={name as any} size={size} color={color} className={className} />;
+const MaterialIcon = ({
+  name,
+  size = 24,
+  color,
+  className,
+}: {
+  name: string;
+  size?: number;
+  color?: string;
+  className?: string;
+}) => {
+  return (
+    <MaterialIcons
+      name={name as any}
+      size={size}
+      color={color}
+      className={className}
+    />
+  );
 };
 
 export default function SettingsScreen() {
@@ -40,6 +66,9 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
 
   const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState<ZipProgress | null>(
+    null,
+  );
   const [isSyncing, setIsSyncing] = useState(false);
   const [showSyncModal, setShowSyncModal] = useState(false);
   const [syncResult, setSyncResult] = useState<{
@@ -50,13 +79,16 @@ export default function SettingsScreen() {
   const handleDownloadReport = async () => {
     if (!user?.congregation_id) return;
     setIsDownloading(true);
+    setDownloadProgress(null);
 
     try {
-      // Service Year: September (8) starts the next service year
       const serviceYear = month >= 9 ? year + 1 : year;
       await reportService.downloadCongregationPublishersServiceYearZip({
         congregation_id: user.congregation_id,
         service_year: serviceYear,
+        onProgress: (progress) => {
+          setDownloadProgress(progress);
+        },
       });
     } catch (error) {
       console.error("Error downloading report:", error);
@@ -72,7 +104,9 @@ export default function SettingsScreen() {
     setIsSyncing(true);
 
     try {
-      const response = await personService.syncPeopleStatus(user.congregation_id);
+      const response = await personService.syncPeopleStatus(
+        user.congregation_id,
+      );
       setSyncResult({
         to_activate: response?.to_activate || [],
         to_deactivate: response?.to_deactivate || [],
@@ -86,7 +120,10 @@ export default function SettingsScreen() {
   };
 
   return (
-    <View className="flex-1 bg-background-light dark:bg-background-dark" style={{ paddingTop: insets.top + 14 }}>
+    <View
+      className="flex-1 bg-background-light dark:bg-background-dark"
+      style={{ paddingTop: insets.top + 14 }}
+    >
       {/* Sticky Responsive Header */}
       <View
         className="z-50 bg-background-light/90 dark:bg-card-dark/90 border-b border-border-input-light dark:border-border-input-dark"
@@ -95,7 +132,9 @@ export default function SettingsScreen() {
         <View className="gap-3 max-w-7xl mx-auto w-full px-4 md:px-6">
           <View className="flex-row items-center md:pt-6 pb-2 justify-between">
             <View>
-              <Text className="text-2xl md:text-3xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark">Ajustes</Text>
+              <Text className="text-2xl md:text-3xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark">
+                Ajustes
+              </Text>
             </View>
 
             <View className="flex-row items-center gap-3">
@@ -103,14 +142,22 @@ export default function SettingsScreen() {
                 className="w-11 h-11 items-center justify-center rounded-full active:bg-slate-100 dark:active:bg-slate-800"
                 onPress={signOut}
               >
-                <MaterialIcon name="logout" size={24} color="#64748b" className="dark:text-slate-400" />
+                <MaterialIcon
+                  name="logout"
+                  size={24}
+                  color="#64748b"
+                  className="dark:text-slate-400"
+                />
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </View>
 
-      <ScrollView className="flex-1" contentContainerStyle={{ flexGrow: 1, padding: 24, paddingBottom: 40 }}>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ flexGrow: 1, padding: 24, paddingBottom: 40 }}
+      >
         <View className="max-w-md mx-auto w-full flex-1 gap-8">
           {/* Section: Reportes y Análisis */}
           <View className="space-y-4">
@@ -121,27 +168,58 @@ export default function SettingsScreen() {
               style={styles.iosShadow}
               className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden"
             >
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={handleDownloadReport}
-                disabled={isDownloading}
-                className="w-full flex-row items-center justify-between p-5 border-b border-border-input-light dark:border-border-input-dark active:bg-slate-50 dark:active:bg-slate-800/50"
-              >
-                <View className="flex-row items-center justify-center gap-4 flex-1 pr-2">
-                  <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
-                    <MaterialIcon name="download" size={22} color="#2563eb" />
+              {isDownloading && downloadProgress ? (
+                <View className="w-full p-4 bg-slate-50 dark:bg-slate-800/50">
+                  <View className="flex-row items-center justify-between mb-2">
+                    <Text className="text-sm font-semibold text-text-main-light dark:text-text-main-dark">
+                      Descargando registros...
+                    </Text>
+                    <Text className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                      {downloadProgress.percent}%
+                    </Text>
                   </View>
-                  <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark flex-1">
-                    Descargar tarjetas de publicadores ({currentYear}){" "}
+                  <View className="h-2 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <View
+                      className="h-full bg-blue-500 rounded-full"
+                      style={{ width: `${downloadProgress.percent}%` }}
+                    />
+                  </View>
+                  <Text className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    {downloadProgress.currentFile}
                   </Text>
-                  {isDownloading && <ActivityIndicator size="small" />}
                 </View>
-                <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
-              </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={handleDownloadReport}
+                  disabled={isDownloading}
+                  className="w-full flex-row items-center justify-between p-5 border-b border-border-input-light dark:border-border-input-dark active:bg-slate-50 dark:active:bg-slate-800/50"
+                >
+                  <View className="flex-row items-center justify-center gap-4 flex-1 pr-2">
+                    <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
+                      <MaterialIcon name="download" size={22} color="#2563eb" />
+                    </View>
+                    <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark flex-1">
+                      Descargar tarjetas de publicadores ({currentYear}){" "}
+                    </Text>
+                    {isDownloading && <ActivityIndicator size="small" />}
+                  </View>
+                  <MaterialIcon
+                    name="chevron-right"
+                    size={20}
+                    color="#cbd5e1"
+                  />
+                </TouchableOpacity>
+              )}
 
               <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={() => ShowAlert("Info", "Funcionalidad en desarrollo, pronto estará disponible.")}
+                onPress={() =>
+                  ShowAlert(
+                    "Info",
+                    "Funcionalidad en desarrollo, pronto estará disponible.",
+                  )
+                }
                 className="w-full flex-row items-center justify-between p-5 border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800/50"
               >
                 <View className="flex-row items-center gap-4">
@@ -157,14 +235,25 @@ export default function SettingsScreen() {
 
               <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={() => ShowAlert("Info", "Funcionalidad en desarrollo, pronto estará disponible.")}
+                onPress={() =>
+                  ShowAlert(
+                    "Info",
+                    "Funcionalidad en desarrollo, pronto estará disponible.",
+                  )
+                }
                 className="w-full flex-row items-center justify-between p-5 border-b border-border-input-light dark:border-border-input-dark active:bg-slate-50 dark:active:bg-slate-800/50"
               >
                 <View className="flex-row items-center gap-4">
                   <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
-                    <MaterialIcon name="description" size={22} color="#2563eb" />
+                    <MaterialIcon
+                      name="description"
+                      size={22}
+                      color="#2563eb"
+                    />
                   </View>
-                  <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark">Resumen mensual</Text>
+                  <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark">
+                    Resumen mensual
+                  </Text>
                 </View>
                 <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
               </TouchableOpacity>
@@ -199,7 +288,12 @@ export default function SettingsScreen() {
             >
               <TouchableOpacity
                 activeOpacity={0.7}
-                onPress={() => ShowAlert("Info", "Funcionalidad en desarrollo, pronto estará disponible.")}
+                onPress={() =>
+                  ShowAlert(
+                    "Info",
+                    "Funcionalidad en desarrollo, pronto estará disponible.",
+                  )
+                }
                 className="w-full flex-row items-center justify-between p-5 border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800/50"
               >
                 <View className="flex-row items-center gap-4">
@@ -221,7 +315,9 @@ export default function SettingsScreen() {
                   <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
                     <MaterialIcon name="person-add" size={22} color="#2563eb" />
                   </View>
-                  <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark">Registrar usuario</Text>
+                  <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark">
+                    Registrar usuario
+                  </Text>
                 </View>
                 <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
               </TouchableOpacity>
@@ -244,7 +340,9 @@ export default function SettingsScreen() {
 
             {/* Version Info */}
             <View className="items-center py-1">
-              <Text className="text-slate-400 dark:text-slate-500 text-xs font-medium">ARI v{APP_VERSION}</Text>
+              <Text className="text-slate-400 dark:text-slate-500 text-xs font-medium">
+                ARI v{APP_VERSION}
+              </Text>
               <Text className="text-slate-300 dark:text-slate-600 text-[10px] mt-1 uppercase tracking-widest">
                 © {currentYear} ARI Mobile App
               </Text>

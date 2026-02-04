@@ -63,17 +63,17 @@ export const api = {
 
     const currentPath = Platform.OS === "web" ? window.location.pathname : navigationState.getPath();
     const toExclude =
-      ["/auth/login", "/auth/sign-in"].includes(normalizedEndpoint) ||
-      (normalizedEndpoint === "/congregations" && options.method === "GET") ||
-      ["/auth/sign-in", "/auth/sign-up"].some((path) => currentPath.includes(path));
+      ["/auth/login", "/auth/sign-in", "/auth/sign-up", "/auth/register"].includes(normalizedEndpoint) ||
+      (normalizedEndpoint === "/congregations" && options.method === "GET");
 
-    const token = await getToken();
-
-    // The header construction was missing/broken in previous edit, restoring it
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       ...((options.headers as Record<string, string>) || {}),
     };
+
+    const token = await getToken();
+
+    console.log(`[API] Token retrieved: ${token ? "yes" : "no"}, endpoint: ${normalizedEndpoint}`);
 
     if (!toExclude) {
       if (token) {
@@ -81,9 +81,11 @@ export const api = {
         if (isValid) {
           headers["Authorization"] = `Bearer ${token}`;
         } else {
+          console.log("[API] Token validation failed");
           throw new Error("Unauthorized");
         }
       } else {
+        console.log("[API] No token found for protected endpoint");
         throw new Error("Unauthorized");
       }
     }
@@ -92,6 +94,8 @@ export const api = {
       ...options,
       headers,
     });
+
+    console.log(`[API] ${options.method || "GET"} ${normalizedEndpoint} - Status: ${response.status}`);
 
     if (!response.ok && !normalizedEndpoint.includes("/auth/login")) {
       console.log("Error en la petición:", response);
