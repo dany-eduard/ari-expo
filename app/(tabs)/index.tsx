@@ -1,6 +1,7 @@
 import { ShowAlert } from "@/components/alert";
 import { useSession } from "@/components/ctx";
 import { ThemedView } from "@/components/themed-view";
+import { LogAction, logActionsService } from "@/services/log-actions.service";
 import { reportService } from "@/services/report.service";
 import { ReportCongregationHome } from "@/types/report.types";
 import { day, getInitialPeriod } from "@/utils/date.utils";
@@ -36,6 +37,8 @@ export default function HomeScreen() {
   const [homeData, setHomeData] = useState<ReportCongregationHome | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [logs, setLogs] = useState<LogAction[]>([]);
+  const [isLoadingLogs, setIsLoadingLogs] = useState(false);
   const { width } = useWindowDimensions();
 
   const isSmallScreen = width < 360;
@@ -57,6 +60,18 @@ export default function HomeScreen() {
       setIsLoading(false);
     }
   }, [user?.congregation_id]);
+
+  const fetchLogs = useCallback(async () => {
+    try {
+      setIsLoadingLogs(true);
+      const response = await logActionsService.findAll({ limit: 5 });
+      setLogs(response.data);
+    } catch (error) {
+      console.error("Error fetching logs:", error);
+    } finally {
+      setIsLoadingLogs(false);
+    }
+  }, []);
 
   const getMonthName = (month: number) => {
     return new Date(year, month - 1, 1).toLocaleString("es-ES", { month: "long" }).replace(/^\w/, (c) => c.toUpperCase());
@@ -100,6 +115,51 @@ export default function HomeScreen() {
     return (homeData.registered_reports / homeData.expected_reports) * 100;
   };
 
+  const getTimeAgo = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return "ahora";
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
+    if (diffInSeconds < 172800) return "Ayer";
+    return date.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
+  };
+
+  const getLogActionDescription = (log: LogAction) => {
+    const actionMap: Record<string, string> = {
+      CREATE: "Agregó",
+      UPDATE: "Actualizó",
+      DELETE: "Eliminó",
+    };
+
+    if (log.entity === "PublisherReport") {
+      if (log.action === "CREATE") {
+        const monthName = new Date(2000, (log.after?.month || 1) - 1).toLocaleString("es-ES", { month: "long" });
+        return `Registró el informe de ${monthName} de ${log.person_name || "alguien"}`;
+      }
+      return `${actionMap[log.action] || "Modificó"} un informe`;
+    }
+
+    let entityName = "";
+    if (log.entity === "Team") {
+      entityName = `el grupo "${log.after?.name || log.before?.name || "Sin nombre"}"`;
+    } else if (log.entity === "Person") {
+      const p = log.after || log.before;
+      entityName = `a ${p ? `${p.first_name} ${p.last_name}` : "una persona"}`;
+    }
+
+    return `${actionMap[log.action] || "Realizó una acción"} ${entityName}`;
+  };
+
+  const getLogIcon = (entity: string, action: string) => {
+    if (entity === "PublisherReport") return "post-add";
+    if (entity === "Team") return "groups";
+    if (entity === "Person") return action === "CREATE" ? "person-add" : "person";
+    return "history";
+  };
+
   const handleDownloadReport = async () => {
     if (!user?.congregation_id) return;
     setIsDownloading(true);
@@ -122,7 +182,8 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchReportCongregationHome();
-    }, [fetchReportCongregationHome]),
+      fetchLogs();
+    }, [fetchReportCongregationHome, fetchLogs]),
   );
 
   return (
@@ -389,46 +450,43 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Recent Activity */}
-        {/* TODO: log de acciones con infinity scroll */}
-        {/* <View className="gap-4 px-4 pt-2 pb-6">
+        <View className="gap-4 px-4 pt-2 pb-6">
           <View className="flex-row items-center justify-between">
-            <Text className="text-lg font-bold">Actividad Reciente</Text>
+            <Text className="text-lg font-bold text-text-main-light dark:text-text-main-dark">Actividad Reciente</Text>
             <TouchableOpacity>
               <Text className="text-primary text-sm font-medium">Ver todo</Text>
             </TouchableOpacity>
           </View>
 
           <View className="gap-3">
-            {[
-              {
-                name: "Carlos Mendoza",
-                action: "Registró 8 horas en Predicación",
-                time: "2h",
-                icon: "post-add",
-              },
-              {
-                name: "Ana Gómez",
-                action: 'Se unió al grupo "Auxiliares"',
-                time: "Ayer",
-                icon: "person-add",
-              },
-            ].map((item, idx) => (
-              <View
-                key={idx}
-                style={styles.floatingCard}
-                className="flex-row items-center gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-50 dark:border-slate-800"
-              >
-                <MaterialIcon name={item.icon} size={24} color="#64748b" />
-                <View className="flex-1">
-                  <Text className="text-sm font-bold">{item.name}</Text>
-                  <Text className="text-text-secondary text-xs">{item.action}</Text>
+            {isLoadingLogs ? (
+              <ActivityIndicator size="small" color="#2563eb" />
+            ) : logs.length === 0 ? (
+              <Text className="text-text-secondary text-sm text-center py-4">No hay actividad reciente</Text>
+            ) : (
+              logs.map((log) => (
+                <View
+                  key={log.id}
+                  style={styles.floatingCard}
+                  className="flex-row items-center gap-4 bg-card-light dark:bg-card-dark p-4 rounded-xl border border-border-input-light dark:border-border-input-dark"
+                >
+                  <View className="p-2 bg-sky-50 dark:bg-sky-500/10 rounded-lg">
+                    <MaterialIcon name={getLogIcon(log.entity, log.action)} size={20} color="#0284c7" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                      {log.user.first_name} {log.user.last_name}
+                    </Text>
+                    <Text className="text-slate-500 dark:text-slate-400 text-xs mt-0.5" numberOfLines={2}>
+                      {getLogActionDescription(log)}
+                    </Text>
+                  </View>
+                  <Text className="text-slate-400 text-[10px] font-medium">{getTimeAgo(log.createdAt)}</Text>
                 </View>
-                <Text className="text-slate-400 text-xs">{item.time}</Text>
-              </View>
-            ))}
+              ))
+            )}
           </View>
-        </View> */}
+        </View>
       </ScrollView>
     </ThemedView>
   );
