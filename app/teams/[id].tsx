@@ -184,7 +184,7 @@ export default function TeamDetailsScreen() {
         stickyHeaderIndices={[0]}
         renderItem={({ item }) => (
           <View style={{ flex: 1 / numColumns, paddingHorizontal: 16, paddingBottom: 16 }}>
-            <PersonCard person={item} onPress={() => router.push(`/people/${item.id}/reports/record`)} />
+            <PersonCard person={item} onDelete={fetchTeam} onPress={() => router.push(`/people/${item.id}/reports/record`)} />
           </View>
         )}
         contentContainerStyle={{ paddingBottom: 160, marginBottom: 10 }}

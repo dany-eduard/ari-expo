@@ -172,7 +172,7 @@ export default function PeopleScreen() {
                 padding: 8,
               }}
             >
-              <PersonCard person={item} onPress={() => router.push(`/people/${item.id}/reports/new`)} />
+              <PersonCard person={item} onDelete={fetchPeople} onPress={() => router.push(`/people/${item.id}/reports/new`)} />
             </View>
           )}
           ListEmptyComponent={

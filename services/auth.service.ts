@@ -9,6 +9,9 @@ export interface AuthResponse {
     first_name: string;
     last_name: string;
     congregation_id: number;
+    congregation: string;
+    permissions: string[];
+    roles: string[];
   };
 }
 

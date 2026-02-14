@@ -7,7 +7,16 @@ const AuthContext = createContext<{
   signIn: (data: LoginFormData) => Promise<void>;
   signOut: () => void;
   session?: string | null;
-  user?: any | null;
+  user?: {
+    id: number;
+    email: string;
+    first_name: string;
+    last_name: string;
+    congregation_id: number;
+    congregation: string;
+    permissions: string[];
+    roles: string[];
+  } | null;
   isLoading: boolean;
 }>({
   signIn: async () => {},
