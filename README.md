@@ -47,7 +47,7 @@
 | 📊 **Dashboard**               | Vista general con estadísticas de la congregación, progreso de informes y actividad reciente                            |
 | 👥 **Gestión de Personas**     | Registro y edición de publicadores con información completa (nombre, fecha de nacimiento, privilegio de servicio, etc.) |
 | 👨‍👩‍👧‍👦 **Gestión de Equipos**      | Administración de grupos de predicación con asignación de integrantes                                                   |
-| 📝 **Informes de Predicación** | Registro mensual de horas, revistas, возвраты y cursos bíblicos por publicador                                          |
+| 📝 **Informes de Predicación** | Registro mensual de horas y cursos bíblicos por publicador                                                              |
 | 📥 **Exportación**             | Generación y descarga de reportes consolidados en formato ZIP                                                           |
 | 🌙 **Modo Oscuro**             | Soporte completo para tema oscuro/claro                                                                                 |
 | 🔐 **Autenticación**           | Sistema de autenticación seguro con JWT                                                                                 |
