@@ -8,16 +8,7 @@ import { day, getInitialPeriod } from "@/utils/date.utils";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import {
-  ActivityIndicator,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const styles = StyleSheet.create({
@@ -30,32 +21,14 @@ const styles = StyleSheet.create({
         elevation: 2,
       },
       web: {
-        boxShadow:
-          "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
       },
     }),
   },
 });
 
-const MaterialIcon = ({
-  name,
-  size = 24,
-  color,
-  className,
-}: {
-  name: string;
-  size?: number;
-  color?: string;
-  className?: string;
-}) => {
-  return (
-    <MaterialIcons
-      name={name as any}
-      size={size}
-      color={color}
-      className={className}
-    />
-  );
+const MaterialIcon = ({ name, size = 24, color, className }: { name: string; size?: number; color?: string; className?: string }) => {
+  return <MaterialIcons name={name as any} size={size} color={color} className={className} />;
 };
 
 export default function HomeScreen() {
@@ -64,9 +37,7 @@ export default function HomeScreen() {
   const [homeData, setHomeData] = useState<ReportCongregationHome | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [downloadProgress, setDownloadProgress] = useState<ZipProgress | null>(
-    null,
-  );
+  const [downloadProgress, setDownloadProgress] = useState<ZipProgress | null>(null);
   const [logs, setLogs] = useState<LogAction[]>([]);
   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
   const { width } = useWindowDimensions();
@@ -102,63 +73,42 @@ export default function HomeScreen() {
     } finally {
       setIsLoadingLogs(false);
     }
-  }, []);
+  }, [user?.congregation_id]);
 
   const getMonthName = (month: number) => {
-    return new Date(year, month - 1, 1)
-      .toLocaleString("es-ES", { month: "long" })
-      .replace(/^\w/, (c) => c.toUpperCase());
+    return new Date(year, month - 1, 1).toLocaleString("es-ES", { month: "long" }).replace(/^\w/, (c) => c.toUpperCase());
   };
 
   const getMonthNameWithYear = (month: number) => {
-    return new Date(year, month - 1, 1)
-      .toLocaleString("es-ES", { month: "long", year: "numeric" })
-      .replace(/^\w/, (c) => c.toUpperCase());
+    return new Date(year, month - 1, 1).toLocaleString("es-ES", { month: "long", year: "numeric" }).replace(/^\w/, (c) => c.toUpperCase());
   };
 
   const renderMessageGoal = () => {
     if (!homeData) return null;
 
     if (homeData.registered_reports === 0 && day >= 1 && day <= 20) {
+      return <Text className="text-white text-sm font-medium">No has registrado ningun informe este mes. ¡No lo dejes para despues!</Text>;
+    }
+
+    if (homeData.registered_reports < homeData.expected_reports && day >= 21 && day <= 31) {
       return (
         <Text className="text-white text-sm font-medium">
-          No has registrado ningun informe este mes. ¡No lo dejes para despues!
+          El mes de {getMonthName(month)} ha finalizado y no se han registrado todos los informes.
         </Text>
       );
     }
 
-    if (
-      homeData.registered_reports < homeData.expected_reports &&
-      day >= 21 &&
-      day <= 31
-    ) {
+    if (homeData.registered_reports > 0 && homeData.registered_reports < homeData.expected_reports) {
       return (
         <Text className="text-white text-sm font-medium">
-          El mes de {getMonthName(month)} ha finalizado y no se han registrado
-          todos los informes.
-        </Text>
-      );
-    }
-
-    if (
-      homeData.registered_reports > 0 &&
-      homeData.registered_reports < homeData.expected_reports
-    ) {
-      return (
-        <Text className="text-white text-sm font-medium">
-          Has registrado {homeData?.registered_reports} informes de{" "}
-          {homeData?.expected_reports} del mes de {getMonthName(month)}. ¡Solo
-          faltan {homeData?.expected_reports - homeData?.registered_reports}{" "}
-          informes para tu meta!
+          Has registrado {homeData?.registered_reports} informes de {homeData?.expected_reports} del mes de {getMonthName(month)}. ¡Solo
+          faltan {homeData?.expected_reports - homeData?.registered_reports} informes para tu meta!
         </Text>
       );
     }
 
     return (
-      <Text className="text-white text-sm font-medium">
-        ¡Que bien! Todos los informes de {getMonthName(month)} han sido
-        registrados
-      </Text>
+      <Text className="text-white text-sm font-medium">¡Que bien! Todos los informes de {getMonthName(month)} han sido registrados</Text>
     );
   };
 
@@ -188,10 +138,7 @@ export default function HomeScreen() {
 
     if (log.entity === "PublisherReport") {
       if (log.action === "CREATE") {
-        const monthName = new Date(
-          2000,
-          (log.after?.month || 1) - 1,
-        ).toLocaleString("es-ES", { month: "long" });
+        const monthName = new Date(2000, (log.after?.month || 1) - 1).toLocaleString("es-ES", { month: "long" });
         return `Registró el informe de ${monthName} de ${log.person_name || "alguien"}`;
       }
       return `${actionMap[log.action] || "Modificó"} un informe`;
@@ -211,8 +158,7 @@ export default function HomeScreen() {
   const getLogIcon = (entity: string, action: string) => {
     if (entity === "PublisherReport") return "post-add";
     if (entity === "Team") return "groups";
-    if (entity === "Person")
-      return action === "CREATE" ? "person-add" : "person";
+    if (entity === "Person") return action === "CREATE" ? "person-add" : "person";
     return "history";
   };
 
@@ -251,35 +197,19 @@ export default function HomeScreen() {
         {/* Sticky Header */}
         <View className="flex-row items-center justify-between p-4 border-b border-border-input-light dark:border-border-input-dark bg-background-light dark:bg-background-dark">
           <View className="flex-row items-center gap-3">
-            <Text className="text-xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark">
-              Inicio
-            </Text>
+            <Text className="text-xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark">Inicio</Text>
           </View>
           <TouchableOpacity className="h-10 w-10 items-center justify-center rounded-full">
-            <MaterialIcon
-              name="notifications-none"
-              size={24}
-              color="#64748b"
-              className="dark:text-slate-400"
-            />
+            <MaterialIcon name="notifications-none" size={24} color="#64748b" className="dark:text-slate-400" />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
 
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ paddingBottom: 10 }}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 10 }} showsVerticalScrollIndicator={false}>
         {/* Profile Section */}
         <View className="flex-row items-center gap-4 px-4 pt-4 pb-6">
           <View className="h-16 w-16 rounded-full border-2 border-border-input-light dark:border-border-input-dark items-center justify-center">
-            <MaterialIcon
-              name="person"
-              size={40}
-              color="#64748b"
-              className="dark:text-slate-400"
-            />
+            <MaterialIcon name="person" size={40} color="#64748b" className="dark:text-slate-400" />
           </View>
           <View>
             <Text className="text-2xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark">
@@ -312,12 +242,9 @@ export default function HomeScreen() {
                   </Text>
                   <View className="flex-row items-baseline mt-1">
                     <Text className="text-white text-4xl font-bold">
-                      {homeData?.registered_reports} de{" "}
-                      {homeData?.expected_reports}{" "}
+                      {homeData?.registered_reports} de {homeData?.expected_reports}{" "}
                     </Text>
-                    <Text className="text-sky-100 ml-1 text-lg font-medium">
-                      informes
-                    </Text>
+                    <Text className="text-sky-100 ml-1 text-lg font-medium">informes</Text>
                   </View>
                 </View>
                 <View className="bg-white/20 px-3 py-1.5 rounded-full flex-row items-center gap-1 border border-white/20">
@@ -332,36 +259,22 @@ export default function HomeScreen() {
 
                 <View className="gap-2">
                   <View className="flex-row justify-between items-center">
-                    <Text className="text-[10px] text-sky-100 font-bold uppercase">
-                      Progreso
-                    </Text>
-                    <Text className="text-xs text-white font-bold">
-                      {getPercentage().toFixed(0)}%
-                    </Text>
+                    <Text className="text-[10px] text-sky-100 font-bold uppercase">Progreso</Text>
+                    <Text className="text-xs text-white font-bold">{getPercentage().toFixed(0)}%</Text>
                   </View>
                   <View className="h-2.5 w-full bg-black/20 rounded-full overflow-hidden border border-white/10">
-                    <View
-                      className="h-full bg-white rounded-full"
-                      style={{ width: `${getPercentage()}%` }}
-                    />
+                    <View className="h-full bg-white rounded-full" style={{ width: `${getPercentage()}%` }} />
                   </View>
                 </View>
 
                 {isDownloading && downloadProgress ? (
                   <View className="h-16 w-full flex-col items-center justify-center gap-2 bg-white/95 rounded-xl border border-sky-100">
                     <View className="flex-row items-center gap-2">
-                      <Text className="text-sky-600 text-xs font-medium">
-                        {downloadProgress.currentFile}
-                      </Text>
-                      <Text className="text-sky-600 text-xs font-bold">
-                        {downloadProgress.percent}%
-                      </Text>
+                      <Text className="text-sky-600 text-xs font-medium">{downloadProgress.currentFile}</Text>
+                      <Text className="text-sky-600 text-xs font-bold">{downloadProgress.percent}%</Text>
                     </View>
                     <View className="h-2 w-[90%] bg-sky-200 rounded-full overflow-hidden">
-                      <View
-                        className="h-full bg-sky-500 rounded-full"
-                        style={{ width: `${downloadProgress.percent}%` }}
-                      />
+                      <View className="h-full bg-sky-500 rounded-full" style={{ width: `${downloadProgress.percent}%` }} />
                     </View>
                   </View>
                 ) : (
@@ -371,9 +284,7 @@ export default function HomeScreen() {
                     disabled={isDownloading}
                     className="h-12 w-full flex-row items-center justify-center gap-2 bg-white rounded-xl shadow-lg"
                   >
-                    <Text className="text-sky-600 text-sm font-bold">
-                      Descargar registro de publicadores
-                    </Text>
+                    <Text className="text-sky-600 text-sm font-bold">Descargar registro de publicadores</Text>
                     {isDownloading && <ActivityIndicator size="small" />}
                   </TouchableOpacity>
                 )}
@@ -384,9 +295,7 @@ export default function HomeScreen() {
 
         {/* Quick Actions */}
         <View className="px-4 pb-2">
-          <Text className="text-lg font-bold mb-4 text-text-main-light dark:text-text-main-dark">
-            Acciones rápidas
-          </Text>
+          <Text className="text-lg font-bold mb-4 text-text-main-light dark:text-text-main-dark">Acciones rápidas</Text>
           <View className="flex-row gap-4">
             <TouchableOpacity
               activeOpacity={0.7}
@@ -396,9 +305,7 @@ export default function HomeScreen() {
               <View className="bg-primary/10 p-3 rounded-full">
                 <MaterialIcon name="post-add" size={24} color="#2563eb" />
               </View>
-              <Text className="text-sm font-medium text-text-main-light dark:text-text-main-dark">
-                Registrar informe
-              </Text>
+              <Text className="text-sm font-medium text-text-main-light dark:text-text-main-dark">Registrar informe</Text>
             </TouchableOpacity>
             <TouchableOpacity
               activeOpacity={0.7}
@@ -408,17 +315,13 @@ export default function HomeScreen() {
               <View className="bg-indigo-50 dark:bg-indigo-500/10 p-3 rounded-full">
                 <MaterialIcon name="person-add" size={24} color="#4f46e5" />
               </View>
-              <Text className="text-sm font-medium text-text-main-light dark:text-text-main-dark">
-                Nueva persona
-              </Text>
+              <Text className="text-sm font-medium text-text-main-light dark:text-text-main-dark">Nueva persona</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Stats Section */}
-        <View
-          className={`flex-row flex-wrap gap-2 px-4 py-3 ${isSmallScreen ? "flex-col" : "flex-row"}`}
-        >
+        <View className={`flex-row flex-wrap gap-2 px-4 py-3 ${isSmallScreen ? "flex-col" : "flex-row"}`}>
           <View
             style={styles.floatingCard}
             className={`${isSmallScreen ? "w-full" : "flex-1"} rounded-xl p-3 bg-card-light dark:bg-card-dark border border-border-input-light dark:border-border-input-dark`}
@@ -428,12 +331,8 @@ export default function HomeScreen() {
                 <MaterialIcon name="groups" size={20} color="#a855f7" />
               </View>
               <View className="items-end">
-                <Text className="text-lg font-bold text-text-main-light dark:text-text-main-dark">
-                  {homeData?.total_teams || 0}
-                </Text>
-                <Text className="text-text-secondary-light dark:text-text-secondary-dark text-[10px] font-medium">
-                  Grupos
-                </Text>
+                <Text className="text-lg font-bold text-text-main-light dark:text-text-main-dark">{homeData?.total_teams || 0}</Text>
+                <Text className="text-text-secondary-light dark:text-text-secondary-dark text-[10px] font-medium">Grupos</Text>
               </View>
             </View>
           </View>
@@ -446,12 +345,8 @@ export default function HomeScreen() {
                 <MaterialIcon name="diversity-3" size={20} color="#f97316" />
               </View>
               <View className="items-end">
-                <Text className="text-lg font-bold text-text-main-light dark:text-text-main-dark">
-                  {homeData?.total_people || 0}
-                </Text>
-                <Text className="text-text-secondary-light dark:text-text-secondary-dark text-[10px] font-medium">
-                  Personas
-                </Text>
+                <Text className="text-lg font-bold text-text-main-light dark:text-text-main-dark">{homeData?.total_people || 0}</Text>
+                <Text className="text-text-secondary-light dark:text-text-secondary-dark text-[10px] font-medium">Personas</Text>
               </View>
             </View>
           </View>
@@ -467,9 +362,7 @@ export default function HomeScreen() {
                 <Text className="text-lg font-bold text-text-main-light dark:text-text-main-dark">
                   {homeData?.total_active_people || 0}
                 </Text>
-                <Text className="text-text-secondary-light dark:text-text-secondary-dark text-[10px] font-medium">
-                  Activos
-                </Text>
+                <Text className="text-text-secondary-light dark:text-text-secondary-dark text-[10px] font-medium">Activos</Text>
               </View>
             </View>
           </View>
@@ -477,12 +370,8 @@ export default function HomeScreen() {
 
         {/* Predication Summary Section */}
         <View className="px-4 pt-2">
-          <Text className="text-lg font-bold mb-3 text-text-main-light dark:text-text-main-dark">
-            Resumen de predicación
-          </Text>
-          <View
-            className={`flex-row flex-wrap gap-2 pb-3 ${isSmallScreen ? "flex-col" : "flex-row"}`}
-          >
+          <Text className="text-lg font-bold mb-3 text-text-main-light dark:text-text-main-dark">Resumen de predicación</Text>
+          <View className={`flex-row flex-wrap gap-2 pb-3 ${isSmallScreen ? "flex-col" : "flex-row"}`}>
             {/* Publicadores */}
             <View
               style={styles.floatingCard}
@@ -490,26 +379,19 @@ export default function HomeScreen() {
             >
               <View className="flex-row items-center gap-1.5 mb-2">
                 <MaterialIcon name="description" size={16} color="#3b82f6" />
-                <Text
-                  className="text-xs font-bold text-text-main-light dark:text-text-main-dark"
-                  numberOfLines={1}
-                >
+                <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark" numberOfLines={1}>
                   Publicadores
                 </Text>
               </View>
               <View className="gap-1">
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">
-                    Informes
-                  </Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Informes</Text>
                   <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
                     {homeData?.summary?.publishers?.reports || 0}
                   </Text>
                 </View>
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">
-                    Cursos bíblicos
-                  </Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Cursos bíblicos</Text>
                   <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
                     {homeData?.summary?.publishers?.bible_courses || 0}
                   </Text>
@@ -524,34 +406,25 @@ export default function HomeScreen() {
             >
               <View className="flex-row items-center gap-1.5 mb-2">
                 <MaterialIcon name="access-time" size={16} color="#f59e0b" />
-                <Text
-                  className="text-xs font-bold text-text-main-light dark:text-text-main-dark"
-                  numberOfLines={1}
-                >
+                <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark" numberOfLines={1}>
                   Auxiliares
                 </Text>
               </View>
               <View className="gap-1">
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">
-                    Informes
-                  </Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Informes</Text>
                   <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
                     {homeData?.summary?.auxiliary_pioneers?.reports || 0}
                   </Text>
                 </View>
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">
-                    Horas
-                  </Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Horas</Text>
                   <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
                     {homeData?.summary?.auxiliary_pioneers?.hours || 0}
                   </Text>
                 </View>
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">
-                    Cursos bíblicos
-                  </Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Cursos bíblicos</Text>
                   <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
                     {homeData?.summary?.auxiliary_pioneers?.bible_courses || 0}
                   </Text>
@@ -566,34 +439,25 @@ export default function HomeScreen() {
             >
               <View className="flex-row items-center gap-1.5 mb-2">
                 <MaterialIcon name="verified" size={16} color="#14b8a6" />
-                <Text
-                  className="text-xs font-bold text-text-main-light dark:text-text-main-dark"
-                  numberOfLines={1}
-                >
+                <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark" numberOfLines={1}>
                   Regulares
                 </Text>
               </View>
               <View className="gap-1">
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">
-                    Informes
-                  </Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Informes</Text>
                   <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
                     {homeData?.summary?.regular_pioneers?.reports || 0}
                   </Text>
                 </View>
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">
-                    Horas
-                  </Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Horas</Text>
                   <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
                     {homeData?.summary?.regular_pioneers?.hours || 0}
                   </Text>
                 </View>
                 <View className="flex-row justify-between items-center">
-                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">
-                    Cursos bíblicos
-                  </Text>
+                  <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs">Cursos bíblicos</Text>
                   <Text className="text-xs font-bold text-text-main-light dark:text-text-main-dark">
                     {homeData?.summary?.regular_pioneers?.bible_courses || 0}
                   </Text>
@@ -605,9 +469,7 @@ export default function HomeScreen() {
 
         <View className="gap-4 px-4 pt-2 pb-6">
           <View className="flex-row items-center justify-between">
-            <Text className="text-lg font-bold text-text-main-light dark:text-text-main-dark">
-              Actividad Reciente
-            </Text>
+            <Text className="text-lg font-bold text-text-main-light dark:text-text-main-dark">Actividad Reciente</Text>
             <TouchableOpacity>
               <Text className="text-primary text-sm font-medium">Ver todo</Text>
             </TouchableOpacity>
@@ -617,9 +479,7 @@ export default function HomeScreen() {
             {isLoadingLogs ? (
               <ActivityIndicator size="small" color="#2563eb" />
             ) : logs.length === 0 ? (
-              <Text className="text-text-secondary text-sm text-center py-4">
-                No hay actividad reciente
-              </Text>
+              <Text className="text-text-secondary text-sm text-center py-4">No hay actividad reciente</Text>
             ) : (
               logs.map((log) => (
                 <View
@@ -628,26 +488,17 @@ export default function HomeScreen() {
                   className="flex-row items-center gap-4 bg-card-light dark:bg-card-dark p-4 rounded-xl border border-border-input-light dark:border-border-input-dark"
                 >
                   <View className="p-2 bg-sky-50 dark:bg-sky-500/10 rounded-lg">
-                    <MaterialIcon
-                      name={getLogIcon(log.entity, log.action)}
-                      size={20}
-                      color="#0284c7"
-                    />
+                    <MaterialIcon name={getLogIcon(log.entity, log.action)} size={20} color="#0284c7" />
                   </View>
                   <View className="flex-1">
                     <Text className="text-sm font-bold text-slate-900 dark:text-slate-100">
                       {log.user.first_name} {log.user.last_name}
                     </Text>
-                    <Text
-                      className="text-slate-500 dark:text-slate-400 text-xs mt-0.5"
-                      numberOfLines={2}
-                    >
+                    <Text className="text-slate-500 dark:text-slate-400 text-xs mt-0.5" numberOfLines={2}>
                       {getLogActionDescription(log)}
                     </Text>
                   </View>
-                  <Text className="text-slate-400 text-[10px] font-medium">
-                    {getTimeAgo(log.createdAt)}
-                  </Text>
+                  <Text className="text-slate-400 text-[10px] font-medium">{getTimeAgo(log.createdAt)}</Text>
                 </View>
               ))
             )}
