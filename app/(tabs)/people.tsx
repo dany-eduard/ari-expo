@@ -126,8 +126,8 @@ export default function PeopleScreen() {
           </View>
 
           {/* Search & Filters */}
-          <View className="py-4 flex-col md:flex-row gap-8 items-center">
-            <View className="relative flex-1 w-full flex-row items-center">
+          <View className="py-4 flex-col md:flex-row gap-4 md:gap-6 items-center w-full">
+            <View className="relative flex-1 md:flex-[0.5] w-full md:w-auto flex-row items-center">
               <View className="absolute left-3 z-10">
                 <MaterialIcons name="search" size={20} color="#94a3b8" />
               </View>
@@ -146,7 +146,7 @@ export default function PeopleScreen() {
               </TouchableOpacity>
             </View>
 
-            <View className="w-full md:w-auto overflow-hidden">
+            <View className="w-full md:flex-1 md:w-auto overflow-hidden">
               <FilterBar
                 categories={{ ...PERSON_CATEGORIES, is_inactive: "Inactivos", not_sent_last_report: "Sin último reporte enviado" }}
                 activeCategory={activeCategory!}

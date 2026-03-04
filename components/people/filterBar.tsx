@@ -1,5 +1,5 @@
 import React from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 interface FilterBarProps {
   categories: Record<string, string>;
@@ -18,12 +18,12 @@ const FilterBar: React.FC<FilterBarProps> = ({ categories, activeCategory, onSel
   };
 
   return (
-    <View className="py-2">
+    <View className="py-2 md:py-0 w-full md:w-auto">
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          paddingHorizontal: 16,
+          paddingHorizontal: Platform.OS === "web" ? 0 : 16,
           gap: 8,
           flexDirection: "row",
           alignItems: "center",
