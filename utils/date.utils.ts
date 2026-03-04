@@ -32,7 +32,7 @@ export const dateToISOString = (year: number, month: number, day: number) => {
 };
 
 export const getInitialPeriod = () => {
-  if (day >= 1 && day <= 20) {
+  if (day >= 1 && day <= 31) {
     if (currentMonth === 1) {
       return { month: 12, year: currentYear - 1 };
     }
