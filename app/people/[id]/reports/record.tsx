@@ -4,6 +4,7 @@ import { personService } from "@/services/person.service";
 import { publisherReportService } from "@/services/publisher-report.service";
 import { Person } from "@/types/person.types";
 import { PublisherReport } from "@/types/publisher-report.types";
+import { getInitialPeriod } from "@/utils/date.utils";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link, router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useState } from "react";
@@ -85,16 +86,6 @@ const currentMonth = now.getMonth() + 1;
 const currentYear = now.getFullYear();
 const day = now.getDate();
 
-const getInitialPeriod = () => {
-  if (day >= 1 && day <= 20) {
-    if (currentMonth === 1) {
-      return { month: 12, year: currentYear - 1 };
-    }
-    return { month: currentMonth - 1, year: currentYear };
-  }
-  return { month: currentMonth, year: currentYear };
-};
-
 const canEditReport = (report: any): boolean => {
   const nowInner = new Date();
   const dayInner = nowInner.getDate();
@@ -145,7 +136,7 @@ export default function ReportHistoryScreen() {
         {} as Record<number, PublisherReport>,
       );
 
-      const { month: initialMonth, year: initialYear } = getInitialPeriod();
+      const { month: initialMonth, year: initialYear } = getInitialPeriod(20);
 
       const orderedReports = monthsOrder.map((month) => {
         const report = reportsByMonth[month];

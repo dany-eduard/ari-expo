@@ -31,8 +31,8 @@ export const dateToISOString = (year: number, month: number, day: number) => {
   return `${year}-${formattedMonth}-${formattedDay}`;
 };
 
-export const getInitialPeriod = () => {
-  if (day >= 1 && day <= 31) {
+export const getInitialPeriod = (maxDay: number = 31) => {
+  if (day >= 1 && day <= maxDay) {
     if (currentMonth === 1) {
       return { month: 12, year: currentYear - 1 };
     }

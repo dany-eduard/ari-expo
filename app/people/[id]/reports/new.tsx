@@ -5,6 +5,7 @@ import { personService } from "@/services/person.service";
 import { publisherReportService } from "@/services/publisher-report.service";
 import { Person } from "@/types/person.types";
 import { PublisherReport } from "@/types/publisher-report.types";
+import { getInitialPeriod } from "@/utils/date.utils";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -111,20 +112,6 @@ const getYearOptions = () => {
     }));
 };
 
-const getInitialPeriod = () => {
-  const day = now.getDate();
-  const currentMonth = now.getMonth() + 1;
-  const currentYear = now.getFullYear();
-
-  if (day >= 1 && day <= 20) {
-    if (currentMonth === 1) {
-      return { month: 12, year: currentYear - 1 };
-    }
-    return { month: currentMonth - 1, year: currentYear };
-  }
-  return { month: currentMonth, year: currentYear };
-};
-
 const formatDateReport = (month: number, year: number) => {
   const d = new Date(year, month - 1, 1);
   const formatted = d.toLocaleDateString("es-ES", {
@@ -166,7 +153,7 @@ export default function NewReportScreen() {
   const [isLoadingReports, setIsLoadingReports] = useState(false);
   const [existingReport, setExistingReport] = useState<PublisherReport | null>(null);
 
-  const { month, year } = getInitialPeriod();
+  const { month, year } = getInitialPeriod(20);
 
   const [formData, setFormData] = useState({
     publisherId: id!,
