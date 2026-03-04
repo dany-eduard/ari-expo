@@ -27,8 +27,9 @@ export interface LogActionsResponse {
 }
 
 export const logActionsService = {
-  findAll(query: { page?: number; limit?: number } = {}) {
+  findAll(query: { congregation_id: number; page?: number; limit?: number }) {
     const params = new URLSearchParams();
+    params.append("congregation_id", query.congregation_id.toString());
     if (query.page) params.append("page", query.page.toString());
     if (query.limit) params.append("limit", query.limit.toString());
 

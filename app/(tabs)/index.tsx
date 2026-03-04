@@ -66,7 +66,7 @@ export default function HomeScreen() {
     try {
       setIsLoadingLogs(true);
       if (!user?.congregation_id) return;
-      const response = await logActionsService.findAll({ limit: 5 });
+      const response = await logActionsService.findAll({ congregation_id: user.congregation_id, limit: 5 });
       setLogs(response.data);
     } catch (error) {
       console.error("Error fetching logs:", error);
