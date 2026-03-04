@@ -1,6 +1,7 @@
 import { ShowAlert } from "@/components/alert";
 import { useSession } from "@/components/ctx";
 import { ThemedView } from "@/components/themed-view";
+import { HomePageSkeleton } from "@/components/ui/home-page-skeleton";
 import { LogAction, logActionsService } from "@/services/log-actions.service";
 import { reportService, ZipProgress } from "@/services/report.service";
 import { ReportCongregationHome } from "@/types/report.types";
@@ -35,7 +36,7 @@ export default function HomeScreen() {
   const { month, year } = getInitialPeriod();
   const { user } = useSession();
   const [homeData, setHomeData] = useState<ReportCongregationHome | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState<ZipProgress | null>(null);
   const [logs, setLogs] = useState<LogAction[]>([]);
@@ -193,19 +194,23 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <SafeAreaView edges={["top"]} style={{ backgroundColor: "transparent" }}>
-        {/* Sticky Header */}
-        <View className="flex-row items-center justify-between p-4 border-b border-border-input-light dark:border-border-input-dark bg-background-light dark:bg-background-dark">
-          <View className="flex-row items-center gap-3">
-            <Text className="text-xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark">Inicio</Text>
-          </View>
-          <TouchableOpacity className="h-10 w-10 items-center justify-center rounded-full">
-            <MaterialIcon name="notifications-none" size={24} color="#64748b" className="dark:text-slate-400" />
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      {isLoading ? (
+        <HomePageSkeleton />
+      ) : (
+        <>
+          <SafeAreaView edges={["top"]} style={{ backgroundColor: "transparent" }}>
+            {/* Sticky Header */}
+            <View className="flex-row items-center justify-between p-4 border-b border-border-input-light dark:border-border-input-dark bg-background-light dark:bg-background-dark">
+              <View className="flex-row items-center gap-3">
+                <Text className="text-xl font-bold tracking-tight text-text-main-light dark:text-text-main-dark">Inicio</Text>
+              </View>
+              <TouchableOpacity className="h-10 w-10 items-center justify-center rounded-full">
+                <MaterialIcon name="notifications-none" size={24} color="#64748b" className="dark:text-slate-400" />
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
 
-      <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 10 }} showsVerticalScrollIndicator={false}>
+          <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: 10 }} showsVerticalScrollIndicator={false}>
         {/* Profile Section */}
         <View className="flex-row items-center gap-4 px-4 pt-4 pb-6">
           <View className="h-16 w-16 rounded-full border-2 border-border-input-light dark:border-border-input-dark items-center justify-center">
@@ -505,6 +510,8 @@ export default function HomeScreen() {
           </View>
         </View>
       </ScrollView>
+      </>
+      )}
     </ThemedView>
   );
 }
