@@ -46,6 +46,12 @@ export default function CongregationsScreen() {
   const [newCode, setNewCode] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
+  // Create State
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [createName, setCreateName] = useState("");
+  const [createCode, setCreateCode] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+
   const fetchCongregations = useCallback(
     async (pageNum = 1, shouldRefresh = false) => {
       try {
@@ -131,6 +137,28 @@ export default function CongregationsScreen() {
       ShowAlert("Error", error.message);
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  const handleCreate = async () => {
+    if (!createName.trim() || !createCode.trim()) {
+      ShowAlert("Error", "El nombre y el código son obligatorios.");
+      return;
+    }
+    setIsCreating(true);
+    try {
+      await congregationService.createCongregation({
+        name: createName.trim(),
+        code: createCode.trim(),
+      });
+      setIsCreateModalVisible(false);
+      setCreateName("");
+      setCreateCode("");
+      fetchCongregations(1, true);
+    } catch (error: any) {
+      ShowAlert("Error", error.message);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -282,6 +310,68 @@ export default function CongregationsScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Create Modal */}
+      <Modal visible={isCreateModalVisible} transparent animationType="fade" onRequestClose={() => setIsCreateModalVisible(false)}>
+        <View className="flex-1 bg-black/50 items-center justify-center p-6">
+          <View className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl p-6">
+            <Text className="text-lg font-bold text-text-main-light dark:text-text-main-dark mb-4">Nueva congregación</Text>
+            <View className="gap-4">
+              <View>
+                <Text className="text-sm font-medium text-slate-500 mb-1 ml-1">Nombre</Text>
+                <TextInput
+                  className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-text-main-light dark:text-text-main-dark"
+                  value={createName}
+                  onChangeText={setCreateName}
+                  placeholder="Nombre de la congregación"
+                  placeholderTextColor="#94a3b8"
+                  autoFocus
+                />
+              </View>
+              <View>
+                <Text className="text-sm font-medium text-slate-500 mb-1 ml-1">Código</Text>
+                <TextInput
+                  className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-text-main-light dark:text-text-main-dark"
+                  value={createCode}
+                  onChangeText={setCreateCode}
+                  placeholder="Ej: ABC-123"
+                  placeholderTextColor="#94a3b8"
+                />
+              </View>
+            </View>
+            <View className="flex-row gap-3 mt-6">
+              <TouchableOpacity
+                onPress={() => setIsCreateModalVisible(false)}
+                className="flex-1 py-3 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800"
+              >
+                <Text className="font-bold text-slate-600 dark:text-slate-400">Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleCreate}
+                disabled={isCreating || !createName.trim() || !createCode.trim()}
+                className="flex-1 py-3 items-center justify-center rounded-xl bg-primary"
+              >
+                {isCreating ? <ActivityIndicator color="white" /> : <Text className="font-bold text-white">Crear</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Floating Action Button */}
+      {!editingItem && !isCreateModalVisible && (
+        <TouchableOpacity
+          onPress={() => {
+            setCreateName("");
+            setCreateCode("");
+            setIsCreateModalVisible(true);
+          }}
+          className="absolute bottom-10 right-8 w-14 h-14 bg-primary rounded-full items-center justify-center shadow-lg active:scale-95"
+          style={Platform.OS === "web" ? { position: "fixed" } : { zIndex: 999 }}
+        >
+          <MaterialIcon name="add" size={32} color="white" />
+        </TouchableOpacity>
+      )}
     </ThemedView>
   );
 }
