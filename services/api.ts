@@ -63,8 +63,8 @@ export const api = {
 
     const currentPath = Platform.OS === "web" ? window.location.pathname : navigationState.getPath();
     const toExclude =
-      ["/auth/login", "/auth/sign-in", "/auth/sign-up", "/auth/register"].includes(normalizedEndpoint) ||
-      (normalizedEndpoint.includes("/congregations") && options.method === "GET");
+      ["/auth/login", "/auth/sign-in", "/auth/sign-up", "/auth/register", "/congregations?limit="].includes(normalizedEndpoint) ||
+      (normalizedEndpoint === "/congregations" && options.method === "GET");
 
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
