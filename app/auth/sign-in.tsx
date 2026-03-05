@@ -21,10 +21,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 
   const fetchCongregations = useCallback(async () => {
     try {
-      const response = await congregationService.getCongregations();
-      if (!response || response.length === 0) return;
+      const response = await congregationService.getCongregations({ limit: 1000 });
+      if (!response || response.data.length === 0) return;
       setCongregations(
-        response.map((congregation: any) => ({ label: `${congregation.name} ${congregation?.code || ""}`, value: congregation.id })),
+        response.data.map((congregation: any) => ({ label: `${congregation.name} ${congregation?.code || ""}`, value: congregation.id })),
       );
     } catch (error) {
       console.error("Error fetching congregations:", error);
