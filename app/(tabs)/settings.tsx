@@ -7,7 +7,7 @@ import { reportService, ZipProgress } from "@/services/report.service";
 import { currentYear, getInitialPeriod } from "@/utils/date.utils";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -48,6 +48,9 @@ export default function SettingsScreen() {
     to_deactivate: { id: number; name: string }[];
   }>({ to_activate: [], to_deactivate: [] });
 
+  const isAdmin = useCallback(() => user?.roles?.includes("admin"), [user]);
+  const isSecretary = useCallback(() => user?.roles?.includes("secretario"), [user]);
+
   const handleDownloadReport = async () => {
     if (!user?.congregation_id) return;
     setIsDownloading(true);
@@ -71,7 +74,6 @@ export default function SettingsScreen() {
   };
 
   const handleSyncPeopleStatus = async () => {
-    console.log(user);
     if (!user?.congregation_id) return;
     setIsSyncing(true);
 
@@ -206,46 +208,51 @@ export default function SettingsScreen() {
             </View>
           </View>
           {/* Section: Configuración */}
-          <View className="space-y-4">
-            <Text className="px-1 text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-[0.1em]">
-              Configuración de app
-            </Text>
-            <View
-              style={styles.iosShadow}
-              className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden"
-            >
-              {user?.roles?.includes("admin") && (
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  onPress={() => router.push("/settings/congregations")}
-                  className="w-full flex-row items-center justify-between p-5 border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800/50"
-                >
-                  <View className="flex-row items-center gap-4">
-                    <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
-                      <MaterialIcon name="group-work" size={22} color="#2563eb" />
-                    </View>
-                    <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark">
-                      Administrar congregaciones
-                    </Text>
-                  </View>
-                  <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
-                </TouchableOpacity>
-              )}
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => router.push("/auth/sign-up")}
-                className="w-full flex-row items-center justify-between p-5 border-b border-border-input-light dark:border-border-input-dark active:bg-slate-50 dark:active:bg-slate-800/50"
+
+          {(isAdmin() || isSecretary()) && (
+            <View className="space-y-4">
+              <Text className="px-1 text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-[0.1em]">
+                Configuración de app
+              </Text>
+              <View
+                style={styles.iosShadow}
+                className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden"
               >
-                <View className="flex-row items-center gap-4">
-                  <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
-                    <MaterialIcon name="person-add" size={22} color="#2563eb" />
-                  </View>
-                  <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark">Registrar usuario</Text>
-                </View>
-                <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
-              </TouchableOpacity>
+                {user?.roles?.includes("admin") && (
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => router.push("/settings/congregations")}
+                    className="w-full flex-row items-center justify-between p-5 border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800/50"
+                  >
+                    <View className="flex-row items-center gap-4">
+                      <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
+                        <MaterialIcon name="group-work" size={22} color="#2563eb" />
+                      </View>
+                      <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark">
+                        Administrar congregaciones
+                      </Text>
+                    </View>
+                    <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
+                  </TouchableOpacity>
+                )}
+                {(isAdmin() || isSecretary()) && (
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => router.push("/auth/sign-up")}
+                    className="w-full flex-row items-center justify-between p-5 border-b border-border-input-light dark:border-border-input-dark active:bg-slate-50 dark:active:bg-slate-800/50"
+                  >
+                    <View className="flex-row items-center gap-4">
+                      <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
+                        <MaterialIcon name="person-add" size={22} color="#2563eb" />
+                      </View>
+                      <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark">Registrar usuario</Text>
+                    </View>
+                    <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
-          </View>
+          )}
 
           <View className="mt-auto gap-8">
             {/* Section: Logout */}

@@ -23,4 +23,8 @@ export const authService = {
       congregation_id: +data.congregation,
     });
   },
+
+  async register(data: any): Promise<AuthResponse & { message?: string }> {
+    return api.post("/auth/register", data);
+  },
 };

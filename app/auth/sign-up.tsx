@@ -1,20 +1,64 @@
 import { ShowAlert } from "@/components/alert";
+import { useSession } from "@/components/ctx";
 import InputField from "@/components/ui/inputField";
 import SelectField from "@/components/ui/selectField";
+import { authService } from "@/services/auth.service";
+import { congregationService } from "@/services/congregation.service";
+import { rolesService } from "@/services/roles.service";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
-import { router } from "expo-router";
-import React, { useState } from "react";
+import { Redirect, router } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function SignUpScreen() {
+  const { user, isLoading: isSessionLoading, signOut } = useSession();
+  const [congregations, setCongregations] = useState<{ label: string; value: string }[]>([]);
+  const [roles, setRoles] = useState<{ label: string; value: string }[]>([]);
   const [formData, setFormData] = useState({
-    name: "",
+    first_name: "",
+    last_name: "",
     email: "",
     password: "",
     confirmPassword: "",
-    congregation: "",
+    congregation_id: "",
+    roles: [] as string[],
   });
   const [isLoading, setIsLoading] = useState(false);
+
+  const isAuthorized = user?.roles?.includes("admin") || user?.roles?.includes("secretario");
+
+  const fetchCongregations = useCallback(async () => {
+    try {
+      const response = await congregationService.getCongregations({ limit: 1000 });
+      if (!response || response.data.length === 0) return;
+      setCongregations(
+        response.data.map((congregation: any) => ({ label: `${congregation.name} ${congregation?.code || ""}`, value: congregation.id })),
+      );
+    } catch (error) {
+      console.error("Error fetching congregations:", error);
+      ShowAlert("Error", "Ocurrió un error al cargar las congregaciones");
+    }
+  }, []);
+
+  const fetchRoles = useCallback(async () => {
+    try {
+      const response = await rolesService.getRoles();
+      if (!response || response.length === 0) return;
+      // Secretary can assign all roles except admin
+      const filteredRoles = user?.roles?.includes("admin") ? response : response.filter((r: any) => r.name !== "admin");
+      setRoles(filteredRoles.map((role: any) => ({ label: role.description, value: role.name })));
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+      ShowAlert("Error", "Ocurrió un error al cargar los roles");
+    }
+  }, [user?.roles]);
+
+  useEffect(() => {
+    if (isAuthorized) {
+      fetchCongregations();
+      fetchRoles();
+    }
+  }, [isAuthorized, fetchCongregations, fetchRoles]);
 
   const validatePassword = (password: string) => {
     const requirements = [
@@ -32,9 +76,17 @@ export default function SignUpScreen() {
     };
   };
 
-  const handleSignUp = () => {
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword || !formData.congregation) {
-      ShowAlert("Error", "Por favor completa todos los campos obligatorios");
+  const handleSignUp = async () => {
+    if (
+      !formData.first_name ||
+      !formData.last_name ||
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword ||
+      !formData.congregation_id ||
+      formData.roles.length === 0
+    ) {
+      ShowAlert("Error", "Por favor completa todos los campos obligatorios, incluyendo al menos un rol.");
       return;
     }
     if (formData.password !== formData.confirmPassword) {
@@ -49,11 +101,35 @@ export default function SignUpScreen() {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      await authService.register({
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        congregation_id: formData.congregation_id,
+        roles: formData.roles,
+      });
+      ShowAlert("Éxito", "Usuario creado correctamente", [{ text: "OK", onPress: () => router.replace("/") }]);
+    } catch (error: any) {
+      ShowAlert("Error", error?.message || "Ocurrió un error al crear la cuenta");
+    } finally {
       setIsLoading(false);
-      ShowAlert("Éxito", "Cuenta creada correctamente", [{ text: "OK", onPress: () => router.replace("/auth/sign-in") }]);
-    }, 1500);
+    }
   };
+
+  // Authorization Check
+  if (isSessionLoading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-background-page">
+        <ActivityIndicator size="large" color="#2563eb" />
+      </View>
+    );
+  }
+
+  if (!isAuthorized) {
+    return <Redirect href="/" />;
+  }
 
   return (
     <KeyboardAvoidingView behavior="padding" className="flex-1">
@@ -69,19 +145,27 @@ export default function SignUpScreen() {
                 <MaterialIcons name="person-add" size={28} color="#2563eb" />
               </View>
               <Text className="text-primary text-sm font-bold tracking-wide uppercase">Informe de Servicio</Text>
-              <Text className="text-text-main text-3xl font-bold tracking-tight text-center">Crear Cuenta</Text>
+              <Text className="text-text-main text-3xl font-bold tracking-tight text-center">Registrar Usuario</Text>
               <Text className="text-text-secondary text-base font-normal text-center max-w-xs">
-                Únete para empezar a organizar tu registro de informes hoy mismo
+                Crea una cuenta para empezar a gestionar los registros en tu congregación
               </Text>
             </View>
 
             {/* Form */}
             <View className="flex flex-col gap-4">
               <InputField
-                label="Nombre completo"
-                placeholder="Juan Pérez"
-                value={formData.name}
-                onChange={(val) => setFormData({ ...formData, name: val })}
+                label="Nombres"
+                placeholder="Juan"
+                value={formData.first_name}
+                onChange={(val) => setFormData({ ...formData, first_name: val })}
+                icon="person"
+              />
+
+              <InputField
+                label="Apellidos"
+                placeholder="Pérez"
+                value={formData.last_name}
+                onChange={(val) => setFormData({ ...formData, last_name: val })}
                 icon="person"
               />
 
@@ -96,14 +180,19 @@ export default function SignUpScreen() {
 
               <SelectField
                 label="Congregación"
-                value={formData.congregation}
-                onChange={(val) => setFormData({ ...formData, congregation: val })}
-                options={[
-                  { label: "Congregación Central", value: "1" },
-                  { label: "Congregación Norte", value: "2" },
-                  { label: "Congregación Sur", value: "3" },
-                  { label: "Congregación Este", value: "4" },
-                ]}
+                placeholder="Selecciona una congregación"
+                value={formData.congregation_id}
+                onChange={(val) => setFormData({ ...formData, congregation_id: val })}
+                options={congregations}
+              />
+
+              <SelectField
+                label="Roles a asignar"
+                placeholder="Selecciona uno o más roles"
+                value={formData.roles}
+                multiple
+                onChange={(val) => setFormData({ ...formData, roles: val })}
+                options={roles}
               />
 
               <InputField
@@ -137,15 +226,20 @@ export default function SignUpScreen() {
                   elevation: 8,
                 }}
               >
-                {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text className="text-white text-base font-bold">Registrarse</Text>}
+                {isLoading ? <ActivityIndicator color="#ffffff" /> : <Text className="text-white text-base font-bold">Crear Usuario</Text>}
               </TouchableOpacity>
             </View>
 
             {/* Footer */}
             <View className="flex flex-row items-center justify-center gap-1 mt-4">
               <Text className="text-text-secondary text-sm">¿Ya tienes una cuenta?</Text>
-              <TouchableOpacity onPress={() => router.replace("/auth/sign-in")} activeOpacity={0.7}>
+              <TouchableOpacity onPress={signOut} activeOpacity={0.7}>
                 <Text className="text-primary text-sm font-bold">Inicia Sesión</Text>
+              </TouchableOpacity>
+            </View>
+            <View className="flex flex-row items-center justify-center gap-1 mt-4">
+              <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7}>
+                <Text className="text-primary text-sm font-bold">Cancelar</Text>
               </TouchableOpacity>
             </View>
           </View>

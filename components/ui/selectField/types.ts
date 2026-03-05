@@ -5,9 +5,10 @@ export interface SelectOption {
 
 export interface SelectFieldProps {
   label: string;
-  value: string;
+  value: string | string[];
   placeholder?: string;
-  onChange: (value: string) => void;
+  onChange: (value: any) => void;
   options: SelectOption[];
   disabled?: boolean;
+  multiple?: boolean;
 }
