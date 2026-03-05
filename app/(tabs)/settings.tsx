@@ -214,21 +214,23 @@ export default function SettingsScreen() {
               style={styles.iosShadow}
               className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden"
             >
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => ShowAlert("Info", "Funcionalidad en desarrollo, pronto estará disponible.")}
-                className="w-full flex-row items-center justify-between p-5 border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800/50"
-              >
-                <View className="flex-row items-center gap-4">
-                  <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
-                    <MaterialIcon name="group-work" size={22} color="#2563eb" />
+              {user?.roles?.includes("admin") && (
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => router.push("/settings/congregations")}
+                  className="w-full flex-row items-center justify-between p-5 border-b border-slate-50 dark:border-slate-800 active:bg-slate-50 dark:active:bg-slate-800/50"
+                >
+                  <View className="flex-row items-center gap-4">
+                    <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
+                      <MaterialIcon name="group-work" size={22} color="#2563eb" />
+                    </View>
+                    <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark">
+                      Administrar congregaciones
+                    </Text>
                   </View>
-                  <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark">
-                    Administrar congregaciones
-                  </Text>
-                </View>
-                <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
-              </TouchableOpacity>
+                  <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 activeOpacity={0.7}
                 onPress={() => router.push("/auth/sign-up")}
