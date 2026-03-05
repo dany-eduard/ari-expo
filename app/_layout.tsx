@@ -50,6 +50,7 @@ function RootLayoutNav() {
         <Stack.Screen name="auth/sign-up" options={{ headerShown: false, animation: "fade", animationDuration: 200 }} />
         <Stack.Screen name="teams" options={{ headerShown: false }} />
         <Stack.Screen name="people" options={{ headerShown: false }} />
+        <Stack.Screen name="settings" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
