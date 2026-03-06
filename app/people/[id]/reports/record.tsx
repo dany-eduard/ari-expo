@@ -177,6 +177,13 @@ export default function ReportHistoryScreen() {
   const totalHours = realReports.reduce((sum, r) => sum + (r.hours || 0), 0);
   const averageHours = realReports.length > 0 ? (totalHours / realReports.length).toFixed(1) : "0.0";
 
+  // Precursor progress calculation
+  const currentServiceYearEnd = currentMonth >= 9 ? currentYear + 1 : currentYear;
+  const isCurrentYear = selectedYear === currentServiceYearEnd;
+  const monthsPassed = monthsOrder.indexOf(currentMonth);
+  const idealHours = isCurrentYear ? monthsPassed * 50 : 600;
+  const progressPercentage = idealHours > 0 ? Math.round((totalHours / idealHours) * 100) : 0;
+
   if (isLoading) return <Loading />;
   if (!person) return null;
 
@@ -274,12 +281,34 @@ export default function ReportHistoryScreen() {
                 <Text className="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase">Total Horas</Text>
                 <MaterialIcons name="schedule" size={20} color="#3b82f6" />
               </View>
-              <Text className="text-2xl font-bold text-text-main-light dark:text-text-main-dark">{totalHours}</Text>
+              <View className="flex-row items-end justify-between">
+                <Text className="text-2xl font-bold text-text-main-light dark:text-text-main-dark">{totalHours}</Text>
+                <View className="items-end">
+                  <Text
+                    className={`text-[12px] font-bold ${
+                      progressPercentage >= 100
+                        ? "text-green-600 dark:text-green-400"
+                        : progressPercentage >= 93
+                          ? "text-orange-500 dark:text-orange-400"
+                          : "text-red-500 dark:text-red-400"
+                    }`}
+                  >
+                    {progressPercentage}%
+                  </Text>
+                  <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark font-medium leading-none">
+                    Ideal: {idealHours}h
+                  </Text>
+                </View>
+              </View>
             </View>
             <View className="flex-1 bg-card-light dark:bg-card-dark p-4 rounded-xl shadow-sm border border-border-input-light dark:border-border-input-dark h-24 justify-between">
               <View className="flex-row justify-between items-start">
                 <Text className="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase">Promedio</Text>
-                <MaterialIcons name="trending-up" size={20} color="#22c55e" />
+                <MaterialIcons
+                  name={progressPercentage >= 100 ? "trending-up" : progressPercentage >= 93 ? "trending-flat" : "trending-down"}
+                  size={20}
+                  color={progressPercentage >= 100 ? "#22c55e" : progressPercentage >= 93 ? "#f59e0b" : "#ef4444"}
+                />
               </View>
               <Text className="text-2xl font-bold text-text-main-light dark:text-text-main-dark">{averageHours}</Text>
             </View>
