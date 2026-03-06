@@ -9,6 +9,7 @@ export interface PublisherReport {
   is_auxiliary_pioneer: boolean;
   hours?: number;
   notes?: string;
+  isVirtual?: boolean;
 
   createdAt?: string;
   updatedAt?: string;

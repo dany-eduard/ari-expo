@@ -155,6 +155,7 @@ export default function ReportHistoryScreen() {
           isCurrent: month === initialMonth,
           isFuture: monthsOrder.indexOf(month) > monthsOrder.indexOf(initialMonth) && selectedYear === monthData?.serviceYear,
           is_auxiliary_pioneer: false,
+          isVirtual: true,
         };
       });
 
@@ -172,8 +173,9 @@ export default function ReportHistoryScreen() {
     }, [fetchData]),
   );
 
-  const totalHours = reports.reduce((sum, r) => sum + (r.hours || 0), 0);
-  const averageHours = reports.length > 0 ? (totalHours / reports.length).toFixed(1) : "0.0";
+  const realReports = reports.filter((r) => !r.isVirtual);
+  const totalHours = realReports.reduce((sum, r) => sum + (r.hours || 0), 0);
+  const averageHours = realReports.length > 0 ? (totalHours / realReports.length).toFixed(1) : "0.0";
 
   if (isLoading) return <Loading />;
   if (!person) return null;
