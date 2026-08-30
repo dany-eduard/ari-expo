@@ -3,7 +3,9 @@ import { NoData } from "@/components/ui/no-data";
 import { reportService } from "@/services/report.service";
 import { RegularPioneerActivityItem, RegularPioneersActivityResponse } from "@/types/report.types";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import * as Print from "expo-print";
 import { router } from "expo-router";
+import { shareAsync } from "expo-sharing";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -101,6 +103,7 @@ export default function RegularPioneersActivityScreen() {
   const [data, setData] = useState<RegularPioneersActivityResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchActivity = useCallback(
@@ -125,6 +128,116 @@ export default function RegularPioneersActivityScreen() {
     [],
   );
 
+  const generatePdf = useCallback(async () => {
+    if (!data) return;
+    setIsExporting(true);
+    try {
+      const pioneerRows = data.pioneers
+        .map((p) => {
+          const green = p.currentTotalHours > 599;
+          return `
+                <tr class="${green ? "green-row" : ""}">
+                  <td>${p.firstName} ${p.lastName}</td>
+                  <td class="num">${p.reportedMonths}</td>
+                  <td class="num">${p.monthlyAverageHours} hrs</td>
+                  <td class="num ${green ? "green-badge" : ""}">${p.currentTotalHours} hrs</td>
+                </tr>`;
+        })
+        .join("");
+
+      const html = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title></title>
+<style>
+  /* Setting margin: 0 in @page eliminates the native iOS running header/footer area.
+     Body padding handles the document margins instead. */
+  @page {
+    size: Letter;
+    margin: 0;
+  }
+  html {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 11px; color: #1e293b; padding: 20mm 18mm; }
+  h1 { font-size: 18px; font-weight: bold; color: #1e40af; margin-bottom: 2px; }
+  .subtitle { font-size: 10px; color: #64748b; margin-bottom: 24px; }
+  h2 { font-size: 13px; font-weight: bold; color: #1e293b; margin-bottom: 8px; margin-top: 20px; border-left: 3px solid #2563eb; padding-left: 8px; }
+  /* Tables: allow breaking across pages, keep each row intact */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 8px; page-break-inside: auto; }
+  thead { display: table-header-group; }
+  tr { page-break-inside: avoid; break-inside: avoid; }
+  th { background: #f1f5f9; color: #475569; font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 8px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+  td { padding: 7px 8px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+  tr:last-child td { border-bottom: none; }
+  .num { text-align: center; }
+  .rank-pos { font-weight: bold; color: #2563eb; text-align: center; width: 40px; }
+  .green-row { background: #f0fdf4; }
+  .green-badge { font-weight: bold; color: #15803d; }
+  .empty { text-align: center; color: #94a3b8; font-style: italic; padding: 12px; }
+  .legend { margin-top: 8px; font-size: 9px; color: #64748b; }
+  .legend span { display: inline-block; width: 10px; height: 10px; background: #bbf7d0; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+  .footer { margin-top: 32px; border-top: 1px solid #e2e8f0; padding-top: 8px; font-size: 9px; color: #94a3b8; text-align: center; page-break-inside: avoid; }
+</style>
+</head>
+<body>
+  <h1>Actividad de Precursores Regulares</h1>
+  <div class="subtitle">Año de Servicio ${selectedYear} &nbsp;|&nbsp; Sep ${selectedYear - 1} – Ago ${selectedYear} &nbsp;|&nbsp; ${data.pioneers.length} precursor${data.pioneers.length !== 1 ? "es" : ""}</div>
+
+  <h2>Tabla de Actividad</h2>
+  <table>
+    <thead>
+      <tr><th>Nombre</th><th class="num">Meses</th><th class="num">Promedio/mes</th><th class="num">Total Horas</th></tr>
+    </thead>
+    <tbody>${pioneerRows}</tbody>
+  </table>
+  <div class="legend"><span></span>Verde: precursores con más de 599 horas acumuladas</div>
+
+  <div class="footer">Generado el ${new Date().toLocaleDateString("es-MX", { day: "2-digit", month: "long", year: "numeric" })}</div>
+</body>
+</html>`;
+
+      if (Platform.OS === "web") {
+        // On web, expo-print would print the entire browser page (the app UI).
+        // Instead, open a new tab with ONLY our HTML so the user can print to PDF from there.
+        const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const win = window.open(url, "_blank");
+        // Trigger the browser print dialog automatically once the page loads
+        if (win) {
+          win.onload = () => {
+            win.focus();
+            win.print();
+          };
+        }
+        URL.revokeObjectURL(url);
+      } else {
+        // iOS / Android: printToFileAsync renders only our HTML string in an
+        // isolated offscreen WebView — no app UI bleeds into the PDF.
+        const { uri } = await Print.printToFileAsync({
+          html,
+          base64: false,
+          // margins: 0 tells iOS UIPrintPageRenderer to reserve no space
+          // for the native running header/footer, suppressing them entirely.
+          margins: { top: 0, right: 0, bottom: 0, left: 0 },
+        });
+        await shareAsync(uri, {
+          mimeType: "application/pdf",
+          dialogTitle: `Precursores Regulares – Año ${selectedYear}`,
+          UTI: "com.adobe.pdf",
+        });
+      }
+    } catch (err) {
+      console.error("Error generando PDF:", err);
+    } finally {
+      setIsExporting(false);
+    }
+  }, [data, selectedYear]);
+
   useEffect(() => {
     fetchActivity(selectedYear);
   }, [fetchActivity, selectedYear]);
@@ -148,9 +261,25 @@ export default function RegularPioneersActivityScreen() {
               Actividad de Precursores
             </Text>
             <Text className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
-              Precursores Regulares • Año {selectedYear} (Sep {selectedYear - 1} - Ago {selectedYear})
+              Precursores Regulares • Año {selectedYear}
             </Text>
           </View>
+          {/* PDF Export button */}
+          <TouchableOpacity
+            onPress={generatePdf}
+            disabled={!data || isLoading || isExporting}
+            className={`w-10 h-10 items-center justify-center rounded-full ${
+              !data || isLoading || isExporting
+                ? "bg-slate-100 dark:bg-slate-800 opacity-40"
+                : "bg-red-50 dark:bg-red-900/30"
+            }`}
+          >
+            {isExporting ? (
+              <ActivityIndicator size="small" color="#ef4444" />
+            ) : (
+              <MaterialIcon name="picture-as-pdf" size={22} color="#ef4444" />
+            )}
+          </TouchableOpacity>
         </View>
       </View>
 
