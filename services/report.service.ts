@@ -22,8 +22,9 @@ export interface DownloadParams {
 }
 
 export const reportService = {
-  async getRegularPioneersActivity(): Promise<RegularPioneersActivityResponse> {
-    return api.get("/reports/regular-pioneers-activity");
+  async getRegularPioneersActivity(serviceYear?: number): Promise<RegularPioneersActivityResponse> {
+    const query = serviceYear ? `?service_year=${serviceYear}` : "";
+    return api.get(`/reports/regular-pioneers-activity${query}`);
   },
 
   async getReportCongregationHome(params: {
