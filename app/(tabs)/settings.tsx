@@ -190,6 +190,22 @@ export default function SettingsScreen() {
 
               <TouchableOpacity
                 activeOpacity={0.7}
+                onPress={() => router.push("/settings/regular-pioneers-activity")}
+                className="w-full flex-row items-center justify-between p-5 border-b border-border-input-light dark:border-border-input-dark active:bg-slate-50 dark:active:bg-slate-800/50"
+              >
+                <View className="flex-row items-center gap-4">
+                  <View className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 items-center justify-center">
+                    <MaterialIcon name="leaderboard" size={22} color="#2563eb" />
+                  </View>
+                  <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark">
+                    Análisis de actividad de Precursores Regulares
+                  </Text>
+                </View>
+                <MaterialIcon name="chevron-right" size={20} color="#cbd5e1" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                activeOpacity={0.7}
                 onPress={handleSyncPeopleStatus}
                 disabled={isSyncing}
                 className="w-full flex-row items-center justify-between p-5 active:bg-slate-50 dark:active:bg-slate-800/50"

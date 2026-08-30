@@ -13,6 +13,12 @@ export default function SettingsLayout() {
           presentation: "modal",
         }}
       />
+      <Stack.Screen
+        name="regular-pioneers-activity"
+        options={{
+          presentation: "modal",
+        }}
+      />
     </Stack>
   );
 }

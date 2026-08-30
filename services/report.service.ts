@@ -1,6 +1,6 @@
 import { ShowAlert } from "@/components/alert";
 import { api } from "@/services/api";
-import { ReportCongregationHome } from "@/types/report.types";
+import { ReportCongregationHome, RegularPioneersActivityResponse } from "@/types/report.types";
 import { Directory, File, Paths } from "expo-file-system";
 import { shareAsync } from "expo-sharing";
 import { Platform } from "react-native";
@@ -22,6 +22,10 @@ export interface DownloadParams {
 }
 
 export const reportService = {
+  async getRegularPioneersActivity(): Promise<RegularPioneersActivityResponse> {
+    return api.get("/reports/regular-pioneers-activity");
+  },
+
   async getReportCongregationHome(params: {
     congregation_id: number | string;
     year: number;

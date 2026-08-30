@@ -22,3 +22,26 @@ export interface ReportCongregationHome {
     };
   };
 }
+
+export interface RegularPioneerActivityItem {
+  id: number;
+  firstName: string;
+  lastName: string;
+  reportedMonths: number;
+  monthlyAverageHours: number;
+  currentTotalHours: number;
+}
+
+export interface RegularPioneerRankingItem {
+  position: number;
+  id: number;
+  firstName: string;
+  lastName: string;
+  currentTotalHours: number;
+}
+
+export interface RegularPioneersActivityResponse {
+  pioneers: RegularPioneerActivityItem[];
+  ranking: RegularPioneerRankingItem[];
+}
+
