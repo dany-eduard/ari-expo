@@ -94,13 +94,10 @@ const getYearOptions = () => {
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth(); // 0-indexed (0 = January)
-  const years = [currentYear];
+  const years = [currentYear - 1, currentYear];
 
-  if (currentMonth <= 2) {
-    // January, February, March
-    years.push(currentYear - 1);
-  } else if (currentMonth >= 10) {
-    // November, December
+  if (currentMonth >= 8) {
+    // September onwards: service year extends into next calendar year
     years.push(currentYear + 1);
   }
 
