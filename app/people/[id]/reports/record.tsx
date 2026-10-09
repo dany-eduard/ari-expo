@@ -4,7 +4,14 @@ import { personService } from "@/services/person.service";
 import { publisherReportService } from "@/services/publisher-report.service";
 import { Person } from "@/types/person.types";
 import { PublisherReport } from "@/types/publisher-report.types";
-import { getInitialPeriod } from "@/utils/date.utils";
+import {
+  currentMonth,
+  getCurrentServiceYear,
+  getInitialPeriod,
+  getServiceYear,
+  getServiceYearMonths,
+  SERVICE_YEAR_MONTHS_ORDER,
+} from "@/utils/date.utils";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link, router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useState } from "react";
@@ -62,29 +69,17 @@ const monthNames = [
 
 const shortMonthNames = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
 
-const monthsOrder = [9, 10, 11, 12, 1, 2, 3, 4, 5, 6, 7, 8];
+const REPORT_DUE_DAY = 20;
 
-const months = (currentYear: number): { month: number; serviceYear: number }[] => {
-  return [
-    { month: 9, serviceYear: currentYear + 1 },
-    { month: 10, serviceYear: currentYear + 1 },
-    { month: 11, serviceYear: currentYear + 1 },
-    { month: 12, serviceYear: currentYear + 1 },
-    { month: 1, serviceYear: currentYear },
-    { month: 2, serviceYear: currentYear },
-    { month: 3, serviceYear: currentYear },
-    { month: 4, serviceYear: currentYear },
-    { month: 5, serviceYear: currentYear },
-    { month: 6, serviceYear: currentYear },
-    { month: 7, serviceYear: currentYear },
-    { month: 8, serviceYear: currentYear },
-  ];
-};
+// Active service year (the one currently running).
+const CURRENT_SERVICE_YEAR = getCurrentServiceYear();
 
-const now = new Date();
-const currentMonth = now.getMonth() + 1;
-const currentYear = now.getFullYear();
-const day = now.getDate();
+// Period whose report is currently due (a report can be entered until day 20 of the following month).
+const { month: DUE_MONTH, year: DUE_YEAR } = getInitialPeriod(REPORT_DUE_DAY);
+const DUE_PERIOD_KEY = DUE_YEAR * 12 + DUE_MONTH;
+
+// Service year the due report belongs to. In September it is the previous service year (August report).
+const INITIAL_SERVICE_YEAR = getServiceYear(DUE_MONTH, DUE_YEAR);
 
 const canEditReport = (report: any): boolean => {
   const nowInner = new Date();
@@ -108,7 +103,7 @@ export default function ReportHistoryScreen() {
   const [person, setPerson] = useState<Person | null>(null);
   const [reports, setReports] = useState<(PublisherReport & { isCurrent?: boolean; isFuture?: boolean })[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [selectedYear, setSelectedYear] = useState(INITIAL_SERVICE_YEAR);
 
   const fetchData = useCallback(async () => {
     if (!id) return;
@@ -123,7 +118,7 @@ export default function ReportHistoryScreen() {
       ]);
       setPerson(personData);
 
-      if (reportsData.length === 0 && selectedYear < currentYear) {
+      if (reportsData.length === 0 && selectedYear < INITIAL_SERVICE_YEAR) {
         setReports([]);
         return;
       }
@@ -136,24 +131,23 @@ export default function ReportHistoryScreen() {
         {} as Record<number, PublisherReport>,
       );
 
-      const { month: initialMonth, year: initialYear } = getInitialPeriod(20);
-
-      const orderedReports = monthsOrder.map((month) => {
+      const orderedReports = getServiceYearMonths(selectedYear).map(({ month, year, serviceYear }, index) => {
         const report = reportsByMonth[month];
         if (report) return report;
-        const monthData = months(selectedYear).find((m) => m.month === month);
+
+        const periodKey = year * 12 + month;
 
         return {
-          id: Math.random(),
-          service_year: monthData?.serviceYear,
-          year: initialYear,
+          id: -index - 1,
+          service_year: serviceYear,
+          year,
           month,
           hours: 0,
           bible_courses: 0,
           participated: false,
           person_id: +id,
-          isCurrent: month === initialMonth,
-          isFuture: monthsOrder.indexOf(month) > monthsOrder.indexOf(initialMonth) && selectedYear === monthData?.serviceYear,
+          isCurrent: periodKey === DUE_PERIOD_KEY,
+          isFuture: periodKey > DUE_PERIOD_KEY,
           is_auxiliary_pioneer: false,
           isVirtual: true,
         };
@@ -178,10 +172,9 @@ export default function ReportHistoryScreen() {
   const averageHours = realReports.length > 0 ? (totalHours / realReports.length).toFixed(1) : "0.0";
 
   // Precursor progress calculation
-  const currentServiceYearEnd = currentMonth >= 9 ? currentYear + 1 : currentYear;
-  const isCurrentYear = selectedYear === currentServiceYearEnd;
-  const monthsPassed = monthsOrder.indexOf(currentMonth);
-  const idealHours = isCurrentYear ? monthsPassed * 50 : 600;
+  const isCurrentServiceYear = selectedYear === CURRENT_SERVICE_YEAR;
+  const monthsPassed = SERVICE_YEAR_MONTHS_ORDER.indexOf(currentMonth);
+  const idealHours = isCurrentServiceYear ? monthsPassed * 50 : 600;
   const progressPercentage = idealHours > 0 ? Math.round((totalHours / idealHours) * 100) : 0;
 
   if (isLoading) return <Loading />;
@@ -265,8 +258,8 @@ export default function ReportHistoryScreen() {
             <Text className="font-bold text-lg text-text-main-light dark:text-text-main-dark">{selectedYear}</Text>
             <TouchableOpacity
               onPress={() => setSelectedYear(selectedYear + 1)}
-              disabled={selectedYear === currentYear}
-              className={`p-1 rounded-md bg-card-light dark:bg-card-dark shadow-sm ${selectedYear === currentYear ? "opacity-50" : ""}`}
+              disabled={selectedYear >= CURRENT_SERVICE_YEAR}
+              className={`p-1 rounded-md bg-card-light dark:bg-card-dark shadow-sm ${selectedYear >= CURRENT_SERVICE_YEAR ? "opacity-50" : ""}`}
             >
               <MaterialIcons name="chevron-right" size={20} color="#2563eb" />
             </TouchableOpacity>

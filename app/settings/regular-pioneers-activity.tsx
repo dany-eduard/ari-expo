@@ -2,6 +2,7 @@ import { ThemedView } from "@/components/themed-view";
 import { NoData } from "@/components/ui/no-data";
 import { reportService } from "@/services/report.service";
 import { RegularPioneerActivityItem, RegularPioneersActivityResponse } from "@/types/report.types";
+import { currentMonth, getCurrentServiceYear } from "@/utils/date.utils";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import * as Print from "expo-print";
 import { router } from "expo-router";
@@ -87,17 +88,11 @@ export default function RegularPioneersActivityScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
-  const now = new Date();
-  const currentCalendarMonth = now.getMonth() + 1; // 1 - 12
-  const currentCalendarYear = now.getFullYear();
-  const currentServiceYear = currentCalendarMonth >= 9 ? currentCalendarYear + 1 : currentCalendarYear;
+  const currentServiceYear = getCurrentServiceYear();
 
-  // In September (9) or October (10), default to the service year that just ended (currentServiceYear - 1),
+  // In September (9) or October (10) default to the service year that just ended,
   // while allowing the user to easily switch to the new service year.
-  const initialServiceYear =
-    currentCalendarMonth === 9 || currentCalendarMonth === 10
-      ? currentServiceYear - 1
-      : currentServiceYear;
+  const initialServiceYear = currentMonth === 9 || currentMonth === 10 ? currentServiceYear - 1 : currentServiceYear;
 
   const [selectedYear, setSelectedYear] = useState(initialServiceYear);
   const [data, setData] = useState<RegularPioneersActivityResponse | null>(null);

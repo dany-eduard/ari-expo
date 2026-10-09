@@ -5,7 +5,7 @@ import { HomePageSkeleton } from "@/components/ui/home-page-skeleton";
 import { LogAction, logActionsService } from "@/services/log-actions.service";
 import { reportService, ZipProgress } from "@/services/report.service";
 import { ReportCongregationHome } from "@/types/report.types";
-import { day, getInitialPeriod } from "@/utils/date.utils";
+import { day, getInitialPeriod, getServiceYear } from "@/utils/date.utils";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
@@ -34,6 +34,7 @@ const MaterialIcon = ({ name, size = 24, color, className }: { name: string; siz
 
 export default function HomeScreen() {
   const { month, year } = getInitialPeriod();
+  const serviceYear = getServiceYear(month, year);
   const { user } = useSession();
   const [homeData, setHomeData] = useState<ReportCongregationHome | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -169,7 +170,6 @@ export default function HomeScreen() {
     setDownloadProgress(null);
 
     try {
-      const serviceYear = month >= 9 ? year + 1 : year;
       await reportService.downloadCongregationPublishersServiceYearZip({
         congregation_id: user.congregation_id,
         service_year: serviceYear,

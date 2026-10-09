@@ -4,7 +4,7 @@ import SyncResultModal from "@/components/SyncResultModal";
 import { APP_VERSION } from "@/constants/config";
 import { personService } from "@/services/person.service";
 import { reportService, ZipProgress } from "@/services/report.service";
-import { currentYear, getInitialPeriod } from "@/utils/date.utils";
+import { currentYear, getInitialPeriod, getServiceYear } from "@/utils/date.utils";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import { useCallback, useState } from "react";
@@ -36,6 +36,7 @@ const MaterialIcon = ({ name, size = 24, color, className }: { name: string; siz
 
 export default function SettingsScreen() {
   const { month, year } = getInitialPeriod();
+  const serviceYear = getServiceYear(month, year);
   const { user, signOut } = useSession();
   const insets = useSafeAreaInsets();
 
@@ -57,7 +58,6 @@ export default function SettingsScreen() {
     setDownloadProgress(null);
 
     try {
-      const serviceYear = month >= 9 ? year + 1 : year;
       await reportService.downloadCongregationPublishersServiceYearZip({
         congregation_id: user.congregation_id,
         service_year: serviceYear,
@@ -150,7 +150,7 @@ export default function SettingsScreen() {
                       <MaterialIcon name="download" size={22} color="#2563eb" />
                     </View>
                     <Text className="font-semibold text-[16px] text-text-main-light dark:text-text-main-dark flex-1">
-                      Descargar tarjetas de publicadores ({currentYear}){" "}
+                      Descargar tarjetas de publicadores ({serviceYear}){" "}
                     </Text>
                     {isDownloading && <ActivityIndicator size="small" />}
                   </View>
