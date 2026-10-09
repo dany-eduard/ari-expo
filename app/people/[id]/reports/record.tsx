@@ -1,7 +1,9 @@
+import { ShowAlert } from "@/components/alert";
 import { Loading } from "@/components/ui/loading";
 import { NoData } from "@/components/ui/no-data";
 import { personService } from "@/services/person.service";
 import { publisherReportService } from "@/services/publisher-report.service";
+import { reportService } from "@/services/report.service";
 import { Person } from "@/types/person.types";
 import { PublisherReport } from "@/types/publisher-report.types";
 import {
@@ -15,7 +17,7 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 import { Link, router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, useColorScheme, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, useColorScheme, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const getBadgeStyles = (dept: string) => {
@@ -103,6 +105,7 @@ export default function ReportHistoryScreen() {
   const [person, setPerson] = useState<Person | null>(null);
   const [reports, setReports] = useState<(PublisherReport & { isCurrent?: boolean; isFuture?: boolean })[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDownloadingCard, setIsDownloadingCard] = useState(false);
   const [selectedYear, setSelectedYear] = useState(INITIAL_SERVICE_YEAR);
 
   const fetchData = useCallback(async () => {
@@ -166,6 +169,30 @@ export default function ReportHistoryScreen() {
       fetchData();
     }, [fetchData]),
   );
+
+  const handleDownloadCard = async () => {
+    if (!person || isDownloadingCard) return;
+
+    setIsDownloadingCard(true);
+    try {
+      const fileName = `${person.last_name} ${person.first_name} ${selectedYear}.pdf`
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[\\/:*?"<>|]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      await reportService.downloadPublisherServiceYearCard({
+        person_id: id,
+        service_year: selectedYear,
+        fileName,
+      });
+    } catch (error: any) {
+      ShowAlert("Error", error?.message || "No se pudo descargar la tarjeta de publicador.");
+    } finally {
+      setIsDownloadingCard(false);
+    }
+  };
 
   const realReports = reports.filter((r) => !r.isVirtual);
   const totalHours = realReports.reduce((sum, r) => sum + (r.hours || 0), 0);
@@ -248,20 +275,37 @@ export default function ReportHistoryScreen() {
           <Text className="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide ml-2">
             Año de Servicio
           </Text>
-          <View className="flex-row items-center gap-3 bg-surface-input-light dark:bg-surface-input-dark rounded-lg p-1">
+          <View className="flex-row items-center gap-2">
+            <View className="flex-row items-center gap-3 bg-surface-input-light dark:bg-surface-input-dark rounded-lg p-1">
+              <TouchableOpacity
+                onPress={() => setSelectedYear(selectedYear - 1)}
+                className="p-1 rounded-md bg-card-light dark:bg-card-dark shadow-sm"
+              >
+                <MaterialIcons name="chevron-left" size={20} color="#64748b" className="dark:text-slate-400" />
+              </TouchableOpacity>
+              <Text className="font-bold text-lg text-text-main-light dark:text-text-main-dark">{selectedYear}</Text>
+              <TouchableOpacity
+                onPress={() => setSelectedYear(selectedYear + 1)}
+                disabled={selectedYear >= CURRENT_SERVICE_YEAR}
+                className={`p-1 rounded-md bg-card-light dark:bg-card-dark shadow-sm ${selectedYear >= CURRENT_SERVICE_YEAR ? "opacity-50" : ""}`}
+              >
+                <MaterialIcons name="chevron-right" size={20} color="#2563eb" />
+              </TouchableOpacity>
+            </View>
             <TouchableOpacity
-              onPress={() => setSelectedYear(selectedYear - 1)}
-              className="p-1 rounded-md bg-card-light dark:bg-card-dark shadow-sm"
+              onPress={handleDownloadCard}
+              disabled={isDownloadingCard}
+              accessibilityRole="button"
+              accessibilityLabel="Descargar tarjeta de publicador"
+              className={`w-9 h-9 rounded-lg items-center justify-center bg-surface-input-light dark:bg-surface-input-dark border border-border-input-light dark:border-border-input-dark active:opacity-60 ${
+                isDownloadingCard ? "opacity-60" : ""
+              }`}
             >
-              <MaterialIcons name="chevron-left" size={20} color="#64748b" className="dark:text-slate-400" />
-            </TouchableOpacity>
-            <Text className="font-bold text-lg text-text-main-light dark:text-text-main-dark">{selectedYear}</Text>
-            <TouchableOpacity
-              onPress={() => setSelectedYear(selectedYear + 1)}
-              disabled={selectedYear >= CURRENT_SERVICE_YEAR}
-              className={`p-1 rounded-md bg-card-light dark:bg-card-dark shadow-sm ${selectedYear >= CURRENT_SERVICE_YEAR ? "opacity-50" : ""}`}
-            >
-              <MaterialIcons name="chevron-right" size={20} color="#2563eb" />
+              {isDownloadingCard ? (
+                <ActivityIndicator size="small" color="#2563eb" />
+              ) : (
+                <MaterialIcons name="file-download" size={20} color="#2563eb" />
+              )}
             </TouchableOpacity>
           </View>
         </View>
